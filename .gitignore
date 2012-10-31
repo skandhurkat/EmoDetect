@@ -1,0 +1,8 @@
+# List of all files to be ignored by git
+
+# Let us start with the stupid temporary files
+*~
+*.swp
+
+# The build directory
+build/
