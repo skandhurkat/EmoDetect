@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 2.6)
-project(CS5780_Term_Project)
+project(CS5780TermProject)
+
+# Set modules path
+set(CMAKE_MODULE_PATH ${CMAKE_ROOT}/Modules
+            ${CS5780TermProject_SOURCE_DIR}/cmake)
 
 # Set version
 set(CS5780_Term_Project_VERSION_MAJOR 1)
