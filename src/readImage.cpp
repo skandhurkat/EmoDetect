@@ -21,7 +21,8 @@ int main(int argc, char** argv)
   const option longOptions[] =
   {
     {"image", required_argument, NULL, 'i'},
-    {"help", no_argument, NULL, 'h'}
+    {"help", no_argument, NULL, 'h'},
+    {NULL, 0, NULL, 0}
   };
 
   string imagePath;
