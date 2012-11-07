@@ -6,3 +6,6 @@
 
 # The build directory
 build/
+
+# My local commit file
+git_commit
