@@ -5,6 +5,6 @@
 #ifndef __EXCEPTIONS_H
 #define __EXCEPTIONS_H
 
-class emptyImageException;
+class emptyImageException{};
 
 #endif // __EXCEPTIONS_H

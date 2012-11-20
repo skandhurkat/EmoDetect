@@ -4,8 +4,8 @@
 void extractMoments(const Mat& img, Mat& rVal)
 {
   if(!img.data)
-    //throw emptyImageException();
-    throw 10;
+    throw emptyImageException();
+    //throw 10;
   rVal.create(1, NUM_MOMENTS, CV_64FC1);
   Mat scaledImg;
   resize(img, scaledImg, Size(MOMENTS_RESIZE,MOMENTS_RESIZE));
