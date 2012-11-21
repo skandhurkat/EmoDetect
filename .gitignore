@@ -4,6 +4,10 @@
 *~
 *.swp
 
+# Any local backup files that you may have
+# Please mark backup files with a .bak extension
+*.bak
+
 # The build directory
 build/
 data/
