@@ -120,8 +120,8 @@ int main(int argc, char** argv)
         {
           i=*it;
           categoryData[i] = j;
-          //PHoG(img, PHOG);
-          d.compute(img,PHOG,Size(0,0),Size(0,0),locations);
+          PHoG(img, PHOG);
+          //d.compute(img,PHOG,Size(0,0),Size(0,0),locations);
           //cout << "size = " << PHOG.size() << endl;
           trainData[i] = new float[PHOG.size()];
           for (int k = 0; k < PHOG.size(); k++) {
