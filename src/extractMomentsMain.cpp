@@ -11,7 +11,12 @@ using namespace std;
 #include <getopt.h>
 #include <dirent.h>
 
+<<<<<<< HEAD:src/extractMoments.cpp
 #define NUM_IMAGES 281
+=======
+#include <FeatureExtractors/extractMoments.h>
+#include <Infrastructure/exceptions.h>
+>>>>>>> master:src/extractMomentsMain.cpp
 
 void usage(const string programName, int exitCode)
 {
@@ -100,6 +105,7 @@ int main(int argc, char** argv)
   {
     if(strcmp(ent->d_name, ".")==0 || strcmp(ent->d_name, "..")==0)
       continue;
+<<<<<<< HEAD:src/extractMoments.cpp
     if(ent->d_type != isFile) {
       string fullPath = directoryPath + ent->d_name;
       if(fullPath[fullPath.length()-1] != '/')
@@ -159,6 +165,19 @@ int main(int argc, char** argv)
       }
       j+=1.0;
       closedir(subdir);
+=======
+    imagePath = directoryPath + ent->d_name;
+    cout << "Attempting to open " << imagePath << endl;
+    Mat img = imread(imagePath, CV_LOAD_IMAGE_GRAYSCALE);
+    Mat m;
+    if(img.data)
+    {
+      extractMoments(img, m);
+      file << m.at<double>(0,0);
+      for(int i = 0; i < NUM_MOMENTS; i++)
+        file << '\t' << m.at<double>(0,i);
+      file << endl;
+>>>>>>> master:src/extractMomentsMain.cpp
     }
     else
     {
