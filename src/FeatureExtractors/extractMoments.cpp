@@ -6,7 +6,7 @@ void extractMoments(const IplImage* imgIpl, Mat& rVal)
 {
   Mat img(imgIpl);
   if(!img.data)
-    throw emptyImageException();
+    throw EMPTY_IMAGE_EXCEPTION;
   rVal.create(1, NUM_MOMENTS, CV_32F);  
   Mat scaledImg;
   resize(img, scaledImg, Size(MOMENTS_RESIZE,MOMENTS_RESIZE));
