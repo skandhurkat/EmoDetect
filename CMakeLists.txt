@@ -11,6 +11,8 @@ set(CS5780_Term_Project_VERSION_MINOR 0)
 
 find_package(OpenCV REQUIRED)
 
+set(CMAKE_C_FLAGS_DEBUG -g -pg -O0)
+
 include_directories(
     ${OpenCV_INCLUDE_DIR}
     ${PROJECT_SOURCE_DIR}/include

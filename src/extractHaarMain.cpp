@@ -10,7 +10,7 @@ using namespace std;
 #include <getopt.h>
 #include <dirent.h>
 
-#include <FeatureExtractors/extractMoments.h>
+#include <FeatureExtractors/extractHaar.h>
 #include <LearningAlgorithms/svm.h>
 #include <LearningAlgorithms/rt.h>
 #include <LearningAlgorithms/ann.h>
@@ -133,17 +133,14 @@ int main(int argc, char** argv)
           continue;
         imagePath = fullPath + subent->d_name;
         cout << "Attempting to open " << imagePath << endl;
-        //Mat img = imread(imagePath, CV_LOAD_IMAGE_GRAYSCALE);
         IplImage* img = cvLoadImage(imagePath.c_str(), CV_LOAD_IMAGE_GRAYSCALE);
         Mat m;
-        //if(img.data)
         if(img!=NULL)
         {
-          extractMoments(img, m);
+          extractHaarFeatures(img, m);
           imageFeatureData.push_back(m);
           categoryData.push_back(static_cast<float>(numCategories));
         }
-        //img.release();
         cvReleaseImage(&img);
       }
       numCategories++;

@@ -10,6 +10,7 @@
 
 # The build directory
 build/
+data/
 
 # My local commit file
 git_commit
