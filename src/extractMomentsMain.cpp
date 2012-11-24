@@ -10,10 +10,8 @@ using namespace std;
 #include <getopt.h>
 #include <dirent.h>
 
-#include <FeatureExtractors/extractMoments.h>
-#include <LearningAlgorithms/svm.h>
-#include <LearningAlgorithms/rt.h>
-#include <LearningAlgorithms/ann.h>
+#include <FeatureExtractors/extractFeatures.h>
+#include <LearningAlgorithms/learningAlgorithms.h>
 #include <Infrastructure/exceptions.h>
 
 void usage(const string programName, int exitCode)
@@ -139,7 +137,7 @@ int main(int argc, char** argv)
         //if(img.data)
         if(img!=NULL)
         {
-          extractMoments(img, m);
+          extractFeatures(img, m, MOMENTS);
           imageFeatureData.push_back(m);
           categoryData.push_back(static_cast<float>(numCategories));
         }
@@ -164,20 +162,41 @@ int main(int argc, char** argv)
   Mat testData = imageFeatureData(Range(static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100,imageFeatureData.rows),Range::all());
   Mat categoryTestData = categoryData(Range(static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100,imageFeatureData.rows),Range::all());
   
+  Mat responses;
+  CvStatModel* model = learningAlgorithmSetup(imageFeatureData.cols,
+      numCategories, SVM_ML);
   float svmTestErr;
-  svmtrain(trainData,categoryTrainData);
-  svmTestErr = svmtest(testData,categoryTestData);
+  learningAlgorithmTrain(model,trainData, categoryTrainData, numCategories,
+      SVM_ML);
+  learningAlgorithmPredict(model, testData, responses, numCategories, SVM_ML);
+  svmTestErr = learningAlgorithmComputeErrorRate(responses,
+      categoryTestData);
+  //svmtrain(trainData,categoryTrainData);
+  //svmTestErr = svmtest(testData,categoryTestData);
   cout << "SVM Test Error " << svmTestErr << "\%" << endl;
+  delete model;
   
   float rtTestErr;
-  rttrain(trainData,categoryTrainData);
-  rtTestErr = svmtest(testData,categoryTestData);
+  model = learningAlgorithmSetup(imageFeatureData.cols, numCategories, RT);
+  learningAlgorithmTrain(model,trainData, categoryTrainData, numCategories,
+      RT);
+  learningAlgorithmPredict(model, testData, responses, numCategories, RT);
+  rtTestErr = learningAlgorithmComputeErrorRate(responses,
+      categoryTestData);
+  //rttrain(trainData,categoryTrainData);
+  //rtTestErr = svmtest(testData,categoryTestData);
   cout << "RT Test Error " << rtTestErr << "\%" << endl;
   
   float annTestErr;
-  annSetup(trainData, categoryTrainData, numCategories);
-  anntrain(trainData,categoryTrainData);
-  annTestErr = anntest(testData, categoryData, numCategories);
+  model = learningAlgorithmSetup(imageFeatureData.cols, numCategories, ANN);
+  learningAlgorithmTrain(model,trainData, categoryTrainData, numCategories,
+      ANN);
+  learningAlgorithmPredict(model, testData, responses, numCategories, ANN);
+  annTestErr = learningAlgorithmComputeErrorRate(responses,
+      categoryTestData);
+  //annSetup(trainData, categoryTrainData, numCategories);
+  //anntrain(trainData,categoryTrainData);
+  //annTestErr = anntest(testData, categoryData, numCategories);
   cout << "ANN Test Error " << annTestErr << "\%" << endl;
   
   file.close();

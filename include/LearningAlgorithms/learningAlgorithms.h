@@ -5,7 +5,7 @@
 using namespace cv;
 #include <Infrastructure/exceptions.h>
 
-enum learningAlgorithm {ANN, SVM, RT};
+enum learningAlgorithm {ANN, SVM_ML, RT};
 
 CvStatModel* learningAlgorithmSetup(int featureVectorSize,
     int numCategories,

@@ -1,7 +1,8 @@
+subdirs(FeatureExtractors)
+link_directories(FeatureExtractors)
 add_executable(readImage readImage.cpp)
-add_executable(extractMomentsMain FeatureExtractors/extractMoments.cpp 
-    LearningAlgorithms/svm.cpp LearningAlgorithms/rt.cpp
-    LearningAlgorithms/ann.cpp
+add_executable(extractMomentsMain
+    LearningAlgorithms/learningAlgorithms.cpp
     extractMomentsMain.cpp)
 add_executable(extractPHoG FeatureExtractors/extractPHoG.cpp
     extractPHoGMain.cpp)
@@ -16,6 +17,7 @@ add_executable(extractGaborMain FeatureExtractors/extractGabor.cpp
     LearningAlgorithms/ann.cpp
     extractGaborMain.cpp)
 target_link_libraries(readImage ${OpenCV_LIBS})
-target_link_libraries(extractMomentsMain ${OpenCV_LIBS})
+target_link_libraries(extractMomentsMain ${OpenCV_LIBS}
+    featureExtractors)
 target_link_libraries(extractHaarMain ${OpenCV_LIBS})
 target_link_libraries(extractGaborMain ${OpenCV_LIBS})
