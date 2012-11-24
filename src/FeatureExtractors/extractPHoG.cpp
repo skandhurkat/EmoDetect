@@ -6,7 +6,7 @@ void extractPHoG(const Mat& img, Mat& PHOG)
   int bins = NUM_BINS;
   int div = NUM_DIVS;
 	if(!img.data)
-		throw emptyImageException();
+		throw EMPTY_IMAGE_EXCEPTION;
 
   PHOG.release();
   PHOG = Mat::zeros(1,div*div*bins,CV_32FC1);
