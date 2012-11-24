@@ -10,7 +10,7 @@
 
 # The build directory
 build/
-data/
+data/images/
 
 # My local commit file
 git_commit

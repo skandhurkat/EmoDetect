@@ -12,6 +12,7 @@ set(CS5780_Term_Project_VERSION_MINOR 0)
 find_package(OpenCV REQUIRED)
 
 set(CMAKE_C_FLAGS_DEBUG -g -pg -O0)
+set(CMAKE_C_FLAGS_RELEASE -03 -DNDEBUG)
 
 include_directories(
     ${OpenCV_INCLUDE_DIR}
@@ -22,4 +23,6 @@ link_directories(
     ${OpenCV_LIBRARY_DIRS}
     )
 
-subdirs(src)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+
+subdirs(src data)
