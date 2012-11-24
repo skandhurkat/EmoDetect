@@ -133,17 +133,14 @@ int main(int argc, char** argv)
           continue;
         imagePath = fullPath + subent->d_name;
         cout << "Attempting to open " << imagePath << endl;
-        //Mat img = imread(imagePath, CV_LOAD_IMAGE_GRAYSCALE);
         IplImage* img = cvLoadImage(imagePath.c_str(), CV_LOAD_IMAGE_GRAYSCALE);
         Mat m;
-        //if(img.data)
         if(img!=NULL)
         {
           extractMoments(img, m);
           imageFeatureData.push_back(m);
           categoryData.push_back(static_cast<float>(numCategories));
         }
-        //img.release();
         cvReleaseImage(&img);
       }
       numCategories++;
@@ -157,7 +154,7 @@ int main(int argc, char** argv)
   
   shuffle(imageFeatureData,categoryData);
   
-  float percentageTestData = 10;
+  float percentageTestData = 50;
   
   Mat trainData = imageFeatureData(Range(0,static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100),Range::all());
   Mat categoryTrainData = categoryData(Range(0,static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100),Range::all());
@@ -171,7 +168,7 @@ int main(int argc, char** argv)
   
   float rtTestErr;
   rttrain(trainData,categoryTrainData);
-  rtTestErr = svmtest(testData,categoryTestData);
+  rtTestErr = rttest(testData,categoryTestData);
   cout << "RT Test Error " << rtTestErr << "\%" << endl;
   
   float annTestErr;

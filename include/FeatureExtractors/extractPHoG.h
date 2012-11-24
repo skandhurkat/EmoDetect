@@ -10,6 +10,6 @@ using namespace cv;
 #define NUM_BINS 16
 #define NUM_DIVS 3
 
-void extractPHoG(const Mat& img, Mat& PHOG);
+void extractPHoG(const IplImage* imgIpl, Mat& PHOG);
 
 #endif // PHOG_3_H_INCLUDED

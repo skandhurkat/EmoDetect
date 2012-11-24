@@ -168,7 +168,7 @@ int main(int argc, char** argv)
   
   float rtTestErr;
   rttrain(trainData,categoryTrainData);
-  rtTestErr = svmtest(testData,categoryTestData);
+  rtTestErr = rttest(testData,categoryTestData);
   cout << "RT Test Error " << rtTestErr << "\%" << endl;
   
   float annTestErr;

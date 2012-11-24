@@ -3,10 +3,10 @@ add_executable(extractMomentsMain FeatureExtractors/extractMoments.cpp
     LearningAlgorithms/svm.cpp LearningAlgorithms/rt.cpp
     LearningAlgorithms/ann.cpp
     extractMomentsMain.cpp)
-add_executable(extractPHoG FeatureExtractors/extractPHoG.cpp
+add_executable(extractPHoGMain FeatureExtractors/extractPHoG.cpp
+    LearningAlgorithms/svm.cpp LearningAlgorithms/rt.cpp
+    LearningAlgorithms/ann.cpp
     extractPHoGMain.cpp)
-target_link_libraries(readImage ${OpenCV_LIBS})
-target_link_libraries(extractPHoG ${OpenCV_LIBS})
 add_executable(extractHaarMain FeatureExtractors/extractHaar.cpp 
     LearningAlgorithms/svm.cpp LearningAlgorithms/rt.cpp
     LearningAlgorithms/ann.cpp
@@ -19,3 +19,4 @@ target_link_libraries(readImage ${OpenCV_LIBS})
 target_link_libraries(extractMomentsMain ${OpenCV_LIBS})
 target_link_libraries(extractHaarMain ${OpenCV_LIBS})
 target_link_libraries(extractGaborMain ${OpenCV_LIBS})
+target_link_libraries(extractPHoGMain ${OpenCV_LIBS})

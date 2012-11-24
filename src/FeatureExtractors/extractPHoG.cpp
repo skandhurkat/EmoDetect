@@ -1,8 +1,9 @@
 #include <FeatureExtractors/extractPHoG.h>
 #include <Infrastructure/exceptions.h>
 
-void extractPHoG(const Mat& img, Mat& PHOG)
+void extractPHoG(const IplImage* imgIpl, Mat& PHOG)
 {
+  Mat img(imgIpl);
   int bins = NUM_BINS;
   int div = NUM_DIVS;
 	if(!img.data)

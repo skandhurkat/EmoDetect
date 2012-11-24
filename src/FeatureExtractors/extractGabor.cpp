@@ -2,7 +2,6 @@
 #include <Infrastructure/exceptions.h>
 #define  _CRT_SECURE_NO_DEPRECATE
 #include <stdio.h>
-//#include <direct.h>
 #include "cxcore.h"
 #include "cv.h"
 #include "highgui.h"
@@ -14,7 +13,6 @@
 #include <iostream>
 #include <getopt.h>
 #include <climits>
-//#include <Windows.h>
 #include <vector>
 #include <cstdio>
 
@@ -328,7 +326,7 @@ int Mulfft3( const CvArr* srcAarr, const CvArr* srcBarr, CvArr* dstarr )
     {
       for( j = 0; j < cols; j ++ )
         {
-
+//  cout<<(i*2)<< " " <<(j*2)<<endl;
 	  c_re = ((double*)(srcA->data.ptr + srcA->step*i))[j*2]*((double*)(srcB->data.ptr + srcB->step*i))[j*2] -
 	    ((double*)(srcA->data.ptr + srcA->step*i))[j*2+1]*((double*)(srcB->data.ptr + srcB->step*i))[j*2+1];
 	  c_im = ((double*)(srcA->data.ptr + srcA->step*i))[j*2]*((double*)(srcB->data.ptr + srcB->step*i))[j*2+1] +
@@ -413,7 +411,6 @@ double* getData(FILE* fh, int &length)
 
 int gabor_extraction(IplImage* img,double* object,CvMat** mGabor)
 {
-
   int w,h;
   w=128;
   h=128;
@@ -424,18 +421,14 @@ int gabor_extraction(IplImage* img,double* object,CvMat** mGabor)
 
   int i,j,x,y,n;
 
-  char coutfilename[512];
-
-
   int dft_M = cvGetOptimalDFTSize( w+h- 1 );
   int dft_N = cvGetOptimalDFTSize( w+h- 1);
-  CvMat* imdft=cvCreateMatHeader(dft_M, dft_N, CV_64FC1 );
-  cvCreateData( imdft);
-
+  
+  CvMat* imdft=cvCreateMat(dft_M, dft_N, CV_64FC1 );
   cvZero(imdft);
   for(i=0; i<h; i++)
     for(j=0; j<w; j++)
-      ((double*)(imdft->data.ptr + imdft->step*i))[j] = ((double*)(imtmp->imageData + imtmp->widthStep*i))[j];
+      ((double*)(imdft->data.ptr + (imdft->step)*i))[j] = ((double*)(imtmp->imageData + imtmp->widthStep*i))[j];
 
   cvDFT( imdft, imdft, CV_DXT_FORWARD, w );
   n=w*h/64;
@@ -450,12 +443,6 @@ int gabor_extraction(IplImage* img,double* object,CvMat** mGabor)
 
 	  cvMulSpectrums( imdft,mGabor[i*8+j], gout, 0);
 	  cvDFT( gout, gout, CV_DXT_INVERSE,w+h-1);
-
-	  char nm[256];
-	  sprintf(nm,"%d_%d.bmp",i,j);
-
-	  Mulfft3(imdft,mGabor[i*8+j],gout);
-	  cvDFT(gout,gout,CV_DXT_INVERSE);
 
 	  /*downsample sacle factor 64*/
 	  for (x=4; x<w; x+=8)
@@ -473,18 +460,15 @@ int gabor_extraction(IplImage* img,double* object,CvMat** mGabor)
         }
     }
 
-  cout << "Dead 2" << endl;
   cvReleaseImage(&imtmp);
-  cout << "Dead 3" << endl;
   cvReleaseMat(&imdft);
-  cout << "Dead 4" << endl;
-
+  
   return(1);
 }
 
 void extractGaborFeatures(const IplImage* img, Mat& gb)
 {
-  long int nsize = 40*128*128/64;
+  unsigned long long nsize = NUM_GABOR_FEATURES;
   CvSize size = cvSize(128,128);
   CvSize img_size = cvGetSize( img );
   IplImage*	ipl=	cvCreateImage(img_size,8,0);
@@ -508,15 +492,13 @@ void extractGaborFeatures(const IplImage* img, Mat& gb)
       cvCopy(tmpsize,ipl,0);
       cvReleaseImage( &tmpsize);
     }
-  //cout<<nsize<<endl;
+    
   double* object=(double*)malloc(nsize*sizeof(double));
   IplImage* tmp=cvCreateImage(size,IPL_DEPTH_64F,0);
 
   cvConvertScale(ipl,tmp,1.0,0);
-  cout << "Fail 1" << endl;
   CvMat** mGabor= LoadGaborFFT("gabor");
   /*Gabor wavelet*/
-  cout << "Fail 2" << endl;
   gabor_extraction(tmp,object,mGabor);
   ZeroMeanUnitLength(object,nsize);
   cvReleaseImage( &tmp);
