@@ -291,7 +291,8 @@ CvMat** LoadGaborFFT(char* fldname)
   for(i=0; i<5; i++)
     for(j=0; j<8; j++)
       {
-	sprintf(filename,"%s/FFT%s_%d_%d.data",fldname,"gabor",i,j);
+	sprintf(filename,"../data/%s/FFT%s_%d_%d.data",fldname,"gabor",i,j);
+	//cout << filename << endl;
 	FILE *ifp = fopen(filename, "rb");
 	mGabor[i*8+j]	= GetMat(ifp,false);
 	fclose(ifp);
@@ -423,7 +424,7 @@ int gabor_extraction(IplImage* img,double* object,CvMat** mGabor)
 
   int dft_M = cvGetOptimalDFTSize( w+h- 1 );
   int dft_N = cvGetOptimalDFTSize( w+h- 1);
-  
+
   CvMat* imdft=cvCreateMat(dft_M, dft_N, CV_64FC1 );
   cvZero(imdft);
   for(i=0; i<h; i++)
@@ -462,7 +463,7 @@ int gabor_extraction(IplImage* img,double* object,CvMat** mGabor)
 
   cvReleaseImage(&imtmp);
   cvReleaseMat(&imdft);
-  
+
   return(1);
 }
 
@@ -492,7 +493,7 @@ void extractGaborFeatures(const IplImage* img, Mat& gb)
       cvCopy(tmpsize,ipl,0);
       cvReleaseImage( &tmpsize);
     }
-    
+
   double* object=(double*)malloc(nsize*sizeof(double));
   IplImage* tmp=cvCreateImage(size,IPL_DEPTH_64F,0);
 
