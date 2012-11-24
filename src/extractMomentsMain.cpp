@@ -11,6 +11,9 @@ using namespace std;
 #include <dirent.h>
 
 #include <FeatureExtractors/extractMoments.h>
+#include <LearningAlgorithms/svm.h>
+#include <LearningAlgorithms/rt.h>
+#include <LearningAlgorithms/ann.h>
 #include <Infrastructure/exceptions.h>
 
 void usage(const string programName, int exitCode)
@@ -21,6 +24,32 @@ void usage(const string programName, int exitCode)
        << "\t--directory=<directory_path>" << endl
        << "\t--output=<output_path>" << endl;
   exit(exitCode);
+}
+
+void shuffle(Mat &data, Mat &catg)
+{
+  Mat data_backup = data.clone();
+  Mat catg_backup = catg.clone();
+  
+  data.pop_back(data_backup.rows);
+  catg.pop_back(catg_backup.rows);
+  
+  vector<int> myvector;
+  vector<int>::iterator it;
+  for(int k=0;k<data_backup.rows;k++)
+  {
+    myvector.push_back(k);
+  }    
+  random_shuffle(myvector.begin(),myvector.end());
+  
+  for (it = myvector.begin(); it!=myvector.end(); ++it)
+  {
+    data.push_back(data_backup.row(*it));
+    catg.push_back(catg_backup.row(*it));
+  }
+  
+  data_backup.release();
+  catg_backup.release();  
 }
 
 int main(int argc, char** argv)
@@ -66,7 +95,10 @@ int main(int argc, char** argv)
        << "\tOutput Path   : " << outputPath << endl;
 
   DIR* dir;
+  DIR* subdir;
   dirent* ent;
+  dirent* subent;
+  unsigned char isFile = 0x8;
 
   dir = opendir(directoryPath.c_str());
   assert(dir);
@@ -77,29 +109,77 @@ int main(int argc, char** argv)
   assert(file.is_open());
 
   string imagePath;
+  Mat imageFeatureData;
+  Mat categoryData;
+  
+  int numImages = 0;
+  int numCategories = 0;
 
+
+  /* Linux Version for directory parsing */
   while((ent=readdir(dir)))
   {
     if(strcmp(ent->d_name, ".")==0 || strcmp(ent->d_name, "..")==0)
       continue;
-    imagePath = directoryPath + ent->d_name;
-    cout << "Attempting to open " << imagePath << endl;
-    Mat img = imread(imagePath, CV_LOAD_IMAGE_GRAYSCALE);
-    Mat m;
-    if(img.data)
+    if(ent->d_type != isFile) 
     {
-      extractMoments(img, m);
-      file << m.at<double>(0,0);
-      for(int i = 0; i < NUM_MOMENTS; i++)
-        file << '\t' << m.at<double>(0,i);
-      file << endl;
+      string fullPath = directoryPath + ent->d_name;
+      if(fullPath[fullPath.length()-1] != '/')
+        fullPath += "/";
+      subdir = opendir(fullPath.c_str());
+      while((subent=readdir(subdir)))
+      {
+        if(strcmp(subent->d_name, ".")==0 || strcmp(subent->d_name, "..")==0)
+          continue;
+        imagePath = fullPath + subent->d_name;
+        cout << "Attempting to open " << imagePath << endl;
+        //Mat img = imread(imagePath, CV_LOAD_IMAGE_GRAYSCALE);
+        IplImage* img = cvLoadImage(imagePath.c_str(), CV_LOAD_IMAGE_GRAYSCALE);
+        Mat m;
+        //if(img.data)
+        if(img!=NULL)
+        {
+          extractMoments(img, m);
+          imageFeatureData.push_back(m);
+          categoryData.push_back(static_cast<float>(numCategories));
+        }
+        //img.release();
+        cvReleaseImage(&img);
+      }
+      numCategories++;
+      closedir(subdir);
     }
     else
     {
       cout << "Could not read image" << endl;
     }
   }
-
+  
+  shuffle(imageFeatureData,categoryData);
+  
+  float percentageTestData = 10;
+  
+  Mat trainData = imageFeatureData(Range(0,static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100),Range::all());
+  Mat categoryTrainData = categoryData(Range(0,static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100),Range::all());
+  Mat testData = imageFeatureData(Range(static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100,imageFeatureData.rows),Range::all());
+  Mat categoryTestData = categoryData(Range(static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100,imageFeatureData.rows),Range::all());
+  
+  float svmTestErr;
+  svmtrain(trainData,categoryTrainData);
+  svmTestErr = svmtest(testData,categoryTestData);
+  cout << "SVM Test Error " << svmTestErr << "\%" << endl;
+  
+  float rtTestErr;
+  rttrain(trainData,categoryTrainData);
+  rtTestErr = svmtest(testData,categoryTestData);
+  cout << "RT Test Error " << rtTestErr << "\%" << endl;
+  
+  float annTestErr;
+  annSetup(trainData, categoryTrainData, numCategories);
+  anntrain(trainData,categoryTrainData);
+  annTestErr = anntest(testData, categoryData, numCategories);
+  cout << "ANN Test Error " << annTestErr << "\%" << endl;
+  
   file.close();
   closedir(dir);
 
