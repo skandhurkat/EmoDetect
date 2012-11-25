@@ -18,7 +18,7 @@ void extractPHoG(const Mat& img, Mat& PHOG)
 
 	unsigned int area_img = img.rows*img.cols;
 
-	short _dx, _dy;
+	float _dx, _dy;
 	float angle;
 	float grad_value;
 
@@ -32,9 +32,10 @@ void extractPHoG(const Mat& img, Mat& PHOG)
       {
         for(int j=0; j<l_y; j++)
         {
-          _dx = dx.at<int>(m*l_x+i, n*l_y+j);
-          _dy = dy.at<int>(m*l_x+i, n*l_y+j);
-          grad_value = std::sqrt(_dx*_dx + _dy*_dy)/area_img;
+          _dx = static_cast<float>(dx.at<int16_t>(m*l_x+i, n*l_y+j));
+          _dy = static_cast<float>(dy.at<int16_t>(m*l_x+i, n*l_y+j));
+          grad_value = static_cast<float>(std::sqrt(1.0*_dx*_dx + _dy*_dy)
+                                          /area_img);
           //*grad_value_it = sqrt(_dy*_dy + _dx*_dx)/area_img;
 
           angle = std::atan2(_dy, _dx);
