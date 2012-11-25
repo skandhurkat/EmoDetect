@@ -161,6 +161,7 @@ int main(int argc, char** argv)
     vector<Rect> detected;
 
     int numCategories = 0;
+    int numImages = 0;
 
     freopen (inputFilePath.c_str() ,"r", stdin);
 
@@ -186,6 +187,9 @@ int main(int argc, char** argv)
         extractFeatures(cropped, m, fEx);
         imageFeatureData.push_back(m);
         categoryData.push_back(static_cast<float>(label));
+        numImages++;
+        if(!(numImages%100) && !verbose)
+          cout << numImages << " images processed" << endl;
       }
       else if(verbose)
         cout << "\tFailed to open " << filename << endl;
