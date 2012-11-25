@@ -10,10 +10,8 @@ using namespace std;
 #include <getopt.h>
 #include <dirent.h>
 
-#include <FeatureExtractors/extractMoments.h>
-#include <LearningAlgorithms/svm.h>
-#include <LearningAlgorithms/rt.h>
-#include <LearningAlgorithms/ann.h>
+#include <FeatureExtractors/extractFeatures.h>
+#include <LearningAlgorithms/learningAlgorithms.h>
 #include <Infrastructure/exceptions.h>
 
 void usage(const string programName, int exitCode)
@@ -58,7 +56,7 @@ int main(int argc, char** argv)
     const char* shortOptions = "i:o:h";
     const option longOptions[] =
     {
-        {"inputFile", required_argument, NULL, 'd'},
+        {"inputFile", required_argument, NULL, 'i'},
         {"output", required_argument, NULL, 'o'},
         {"help", no_argument, NULL, 'h'},
         {NULL, 0, NULL, 0}
@@ -121,15 +119,8 @@ int main(int argc, char** argv)
         Mat m;
         if(img!=NULL)
         {
-            extractMoments(img, m);
+          extractFeatures(img, m, MOMENTS);
             imageFeatureData.push_back(m);
-            /*
-                for(int i = 0; i < NUM_GABOR_FEATURES; i++)
-                {
-                    file << '\t' << m.at<float>(0,i);
-                }
-                file << endl;
-            */
             categoryData.push_back(static_cast<float>(label));
         }
         numCategories = label;
@@ -146,25 +137,47 @@ int main(int argc, char** argv)
     Mat testData = imageFeatureData(Range(static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100,imageFeatureData.rows),Range::all());
     Mat categoryTestData = categoryData(Range(static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100,imageFeatureData.rows),Range::all());
 
-    float svmTestErr;
-    svmtrain(trainData,categoryTrainData);
-    svmTestErr = svmtest(testData,categoryTestData);
-    cout << "SVM Test Error " << svmTestErr << "\%" << endl;
+  Mat responses;
+  CvStatModel* model = learningAlgorithmSetup(imageFeatureData.cols,
+      numCategories, SVM_ML);
+  float svmTestErr;
+  learningAlgorithmTrain(model,trainData, categoryTrainData, numCategories,
+      SVM_ML);
+  learningAlgorithmPredict(model, testData, responses, numCategories, SVM_ML);
+  svmTestErr = learningAlgorithmComputeErrorRate(responses,
+      categoryTestData);
+  //svmtrain(trainData,categoryTrainData);
+  //svmTestErr = svmtest(testData,categoryTestData);
+  cout << "SVM Test Error " << svmTestErr << "\%" << endl;
+  delete model;
+  
+  float rtTestErr;
+  model = learningAlgorithmSetup(imageFeatureData.cols, numCategories, RT);
+  learningAlgorithmTrain(model,trainData, categoryTrainData, numCategories,
+      RT);
+  learningAlgorithmPredict(model, testData, responses, numCategories, RT);
+  rtTestErr = learningAlgorithmComputeErrorRate(responses,
+      categoryTestData);
+  //rttrain(trainData,categoryTrainData);
+  //rtTestErr = svmtest(testData,categoryTestData);
+  cout << "RT Test Error " << rtTestErr << "\%" << endl;
+  delete model;
+  
+  float annTestErr;
+  model = learningAlgorithmSetup(imageFeatureData.cols, numCategories, ANN);
+  learningAlgorithmTrain(model,trainData, categoryTrainData, numCategories,
+      ANN);
+  learningAlgorithmPredict(model, testData, responses, numCategories, ANN);
+  annTestErr = learningAlgorithmComputeErrorRate(responses,
+      categoryTestData);
+  //annSetup(trainData, categoryTrainData, numCategories);
+  //anntrain(trainData,categoryTrainData);
+  //annTestErr = anntest(testData, categoryData, numCategories);
+  cout << "ANN Test Error " << annTestErr << "\%" << endl;
+  delete model;
+  
+  file.close();
+  closedir(dir);
 
-    float rtTestErr;
-    rttrain(trainData,categoryTrainData);
-    rtTestErr = rttest(testData,categoryTestData);
-    cout << "RT Test Error " << rtTestErr << "\%" << endl;
-
-    float annTestErr;
-    annSetup(trainData, categoryTrainData, numCategories);
-    anntrain(trainData,categoryTrainData);
-    annTestErr = anntest(testData, categoryData, numCategories);
-    cout << "ANN Test Error " << annTestErr << "\%" << endl;
-
-    /*
-        file.close();
-    */
-
-    return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }

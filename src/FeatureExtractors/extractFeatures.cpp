@@ -4,14 +4,14 @@
 void extractFeatures(const IplImage* inputImage, Mat& featureVector,
     featureExtractor fEx)
 {
-  if(!IplImage) throw EMPTY_IMAGE_EXCEPTION;
+  if(!inputImage) throw EMPTY_IMAGE_EXCEPTION;
   switch(fEx)
   {
   case HAAR:
-    extractHaar(inputImage, featureVector);
+    extractHaarFeatures(inputImage, featureVector);
     break;
   case GABOR:
-    extractGabor(inputImage, featureVector);
+    extractGaborFeatures(inputImage, featureVector);
     break;
   case MOMENTS:
     extractMoments(inputImage, featureVector);

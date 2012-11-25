@@ -2,26 +2,32 @@
 
 CvStatModel* learningAlgorithmSetup(int featureVectorSize,
     int numCategories,
-    leaningAlgorithm lA)
+    learningAlgorithm lA)
 {
   CvStatModel* model = NULL;
   switch(lA)
   {
   case ANN:
+    {
     model = new CvANN_MLP();
     int layerSizeArray[] = {featureVectorSize, 128, numCategories};
     Mat layerSize = Mat(1, 3, CV_32S, layerSizeArray);
     reinterpret_cast<CvANN_MLP*>(model)
       ->create(layerSize, CvANN_MLP::SIGMOID_SYM, 1, 1);
     break;
-  case SVM:
+    }
+  case SVM_ML:
+    {
     model = new CvSVM();
     break;
+    }
   case RT:
+    {
     model = new CvRTrees();
     break;
+    }
   default:
-    throw INVALID_LEARNING_ALGORITHM
+    throw INVALID_LEARNING_ALGORITHM;
   }
   return model;
 }
@@ -35,22 +41,28 @@ void learningAlgorithmTrain(CvStatModel* model,
   switch(lA)
   {
   case ANN:
+    {
     Mat tmpOp = Mat::zeros(responses.rows, numCategories, CV_32F);
     for (int i = 0; i < responses.rows; i++)
       tmpOp.at<float>(i,static_cast<int>(responses.at<float>(i,0))) = 1;
     Mat annWt = Mat::ones(responses.rows, 1, CV_32F);
-    reinterpret_cast<CvNN_MLP*>(model)->train(trainData, tmpOp, annWt);
+    reinterpret_cast<CvANN_MLP*>(model)->train(trainData, tmpOp, annWt);
     break;
-  case SVM:
+    }
+  case SVM_ML:
+    {
     SVMParams svmParams;
     svmParams.kernel_type = CvSVM::LINEAR;
     reinterpret_cast<CvSVM*>(model)->train(trainData, responses,
         Mat(), Mat(), svmParams);
     break;
+    }
   case RT:
+    {
     reinterpret_cast<CvRTrees*>(model)->train(trainData, CV_ROW_SAMPLE,
         responses);
     break;
+    }
   default:
     throw INVALID_LEARNING_ALGORITHM;
   }
@@ -66,6 +78,7 @@ void learningAlgorithmPredict(CvStatModel* model,
   switch(lA)
   {
   case ANN:
+    {
     Mat tmpOps(featureData.rows, numCategories, CV_32F);
     reinterpret_cast<CvANN_MLP*>(model)->predict(featureData, tmpOps);
     for(int i = 0; i < featureData.rows; i++)
@@ -83,16 +96,21 @@ void learningAlgorithmPredict(CvStatModel* model,
       responses.at<float>(i,0) = prediction;
     }
     break;
-  case SVM:
+    }
+  case SVM_ML:
+    {
     reinterpret_cast<CvSVM*>(model)->predict(featureData, responses);
     break;
+    }
   case RT:
+    {
     for(int i = 0; i < featureData.rows; i++)
     {
       responses.at<float>(i,0) = reinterpret_cast<CvRTrees*>(model)
         ->predict(featureData.row(i));
     }
     break;
+    }
   default:
     throw INVALID_LEARNING_ALGORITHM;
   }
