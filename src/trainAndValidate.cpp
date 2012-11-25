@@ -193,6 +193,7 @@ int main(int argc, char** argv)
         numCategories = label;
     }
     numCategories += 1;
+    DisposeKernels(); //TODO: Repair this cheap hack
 
     shuffle(imageFeatureData,categoryData);
 

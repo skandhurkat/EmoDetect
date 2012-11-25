@@ -523,6 +523,7 @@ void extractGaborFeatures(const IplImage* img, Mat& gb)
   for(int i=0;i<NUM_GABOR_FEATURES;i++) {
     gb.at<float>(0, actualSize++) = static_cast<float>(object[i]);
   }
+  free(object);
 }
 
 int gabor_kernel(int scale,int orientation,int mask_size,double kmax,double sigma,char* filename)
