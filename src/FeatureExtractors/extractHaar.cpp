@@ -44,10 +44,11 @@ void extractHaarFeatures(const IplImage* img, Mat& haar)
   IplImage* integral=cvCreateImage(size2,IPL_DEPTH_64F,0);
   CvMat * sqSum = cvCreateMat(temp->height + 1, temp->width + 1, CV_64FC1);
   cvIntegral(temp, integral, sqSum);
+  cvReleaseMat(&sqSum);
 
-  IplImage* tem = cvCreateImage(size2, IPL_DEPTH_64F, 0);
-  cvCvtScale(integral,tem);
-  cvNormalize(tem, tem, 0, 255, CV_MINMAX);
+//  IplImage* tem = cvCreateImage(size2, IPL_DEPTH_64F, 0);
+//  cvCvtScale(integral,tem);
+//  cvNormalize(tem, tem, 0, 255, CV_MINMAX);
 
   int actualSize = 0;
   // top left

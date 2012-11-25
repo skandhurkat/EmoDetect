@@ -182,9 +182,7 @@ int main(int argc, char** argv)
           cerr << "Error! Need exactly one face in " << filename << endl;
           continue;
         }
-        Mat cropped = img.rowRange(detected[0].y,
-            detected[0].y+detected[0].height).colRange(detected[0].x,
-            detected[0].x+detected[0].width);
+        Mat cropped = img(detected[0]);
         extractFeatures(cropped, m, fEx);
         imageFeatureData.push_back(m);
         categoryData.push_back(static_cast<float>(label));
@@ -212,7 +210,7 @@ int main(int argc, char** argv)
   learningAlgorithmPredict(model, testData, responses, numCategories, lA);
   testErr = learningAlgorithmComputeErrorRate(responses,
       categoryTestData);
-  cout << lAlgorithm << "validation error " << testErr*100 << "\%" 
+  cout << lAlgorithm << " validation error " << testErr*100 << "\%" 
        << endl;
   delete model;
  

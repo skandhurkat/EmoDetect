@@ -10,17 +10,13 @@ void extractFeatures(const Mat& inputImage, Mat& featureVector,
   case HAAR:
     {
     IplImage img = inputImage;
-    IplImage* Img = &img;
-    extractHaarFeatures(Img, featureVector);
-    cvReleaseImage(&Img);
+    extractHaarFeatures(&img, featureVector);
     break;
     }
   case GABOR:
     {
     IplImage img = inputImage;
-    IplImage* Img = &img;
-    extractGaborFeatures(Img, featureVector);
-    cvReleaseImage(&Img);
+    extractGaborFeatures(&img, featureVector);
     break;
     }
   case MOMENTS:
