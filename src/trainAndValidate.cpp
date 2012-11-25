@@ -1,0 +1,195 @@
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
+using namespace cv;
+#include <cstdlib>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <cstring>
+using namespace std;
+#include <getopt.h>
+#include <dirent.h>
+
+#include <FeatureExtractors/extractFeatures.h>
+#include <LearningAlgorithms/learningAlgorithms.h>
+#include <Infrastructure/exceptions.h>
+
+void usage(const string programName, int exitCode)
+{
+    cout << "Usage\n"
+         << programName << " [options]" << endl
+         << "Options include:" << endl
+         << "\t--inputFile=<inputFile path>" << endl
+         << "\t--featureExtractor=[gabor haar moments phog]" << endl
+         << "\t--learningAlgorithm=[ann rt svm]" << endl
+         << "\t--saveClassifier=<file path>" << endl
+         << "\t--percentageValidationData=<percentage of validation data>"
+            << endl
+         << "\t--verbose" << endl
+         << "\t--help" << endl;
+    exit(exitCode);
+}
+
+void shuffle(Mat &data, Mat &catg)
+{
+    Mat data_backup = data.clone();
+    Mat catg_backup = catg.clone();
+
+    data.pop_back(data_backup.rows);
+    catg.pop_back(catg_backup.rows);
+
+    vector<int> myvector;
+    vector<int>::iterator it;
+    for(int k=0; k<data_backup.rows; k++)
+    {
+        myvector.push_back(k);
+    }
+    random_shuffle(myvector.begin(),myvector.end());
+
+    for (it = myvector.begin(); it!=myvector.end(); ++it)
+    {
+        data.push_back(data_backup.row(*it));
+        catg.push_back(catg_backup.row(*it));
+    }
+
+    data_backup.release();
+    catg_backup.release();
+}
+
+int main(int argc, char** argv)
+{
+    const string programName = argv[0];
+    int verbose = 0;
+    float percentageTestData = 10;
+    const char* shortOptions = "i:f:l:s:p:h";
+    const option longOptions[] =
+    {
+        {"inputFile", required_argument, NULL, 'i'},
+        {"featureExtractor", required_argument, NULL, 'f'},
+        {"learningAlgorithm", required_argument, NULL, 'l'},
+        {"saveClassifier", required_argument, NULL, 's'},
+        {"percentageValidationData", required_argument, NULL, 'p'},
+        {"verbose", no_argument, &verbose, 1},
+        {"help", no_argument, NULL, 'h'},
+        {NULL, 0, NULL, 0}
+    };
+
+    string inputFilePath;
+    featureExtractor fEx;
+    learningAlgorithm lA;
+    string saveClassifierLocation; //TODO: Not implemented yet.
+
+    int opt;
+    while((opt=getopt_long(argc, argv, shortOptions, longOptions, NULL))
+            != -1)
+    {
+        switch(opt)
+        {
+        case 'h':
+            usage(programName, EXIT_SUCCESS);
+            break;
+        case 'i':
+            inputFilePath = optarg;
+            break;
+        case 'f':
+            if(!strcmp(optarg,"gabor"))
+              fEx = GABOR;
+            else if(!strcmp(optarg,"haar"))
+              fEx = HAAR;
+            else if(!strcmp(optarg,"moments"))
+              fEx = MOMENTS;
+            else if(!strcmp(optarg,"phog"))
+              fEx = PHOG;
+            break;
+        case 'l':
+            if(!strcmp(optarg,"ann"))
+              lA = ANN;
+            else if(!strcmp(optarg,"rt"))
+              lA = RT;
+            else if(!strcmp(optarg,"svm"))
+              lA = SVM_ML;
+            break;
+        case 's':
+            saveClassifierLocation = optarg;
+            break;
+        case 'p':
+            percentageTestData = atof(optarg);
+            break;
+        case '?':
+        default :
+            usage(programName, EXIT_FAILURE);
+            break;
+        }
+    }
+    assert(!inputFilePath.empty());
+    assert(percentageTestData > 0);
+
+    string fExtractor = (fEx==GABOR)?"Gabor":
+                        (fEx==HAAR)?"Haar":
+                        (fEx==MOMENTS)?"Moments":
+                        (fEx==PHOG)?"PHoG":"Error!";
+    string lAlgorithm = (lA==ANN)?"ANN":
+                        (lA==RT)?"RT":
+                        (lA==SVM_ML)?"SVM":"Error!";
+
+    cout << "Received arguments" << endl
+         << "\tProgram Name      : " << programName << endl
+         << "\tInput File Path   : " << inputFilePath << endl
+         << "\tFeature Extractor : " << fExtractor << endl
+         << "\tLearning Algorithm: " << lAlgorithm << endl
+         << "\tSave Classifier at: " << saveClassifierLocation << endl
+         << "\tPercentageTestData: " << percentageTestData << endl;
+
+    string imagePath;
+    Mat imageFeatureData;
+    Mat categoryData;
+
+    int numCategories = 0;
+
+    freopen (inputFilePath.c_str() ,"r", stdin);
+
+    string filename;
+    int label;
+    while(cin >> label)
+    {
+      cin >> filename;
+      if(verbose)
+        cout << "Attempting to open " << filename << endl;
+      IplImage* img= cvLoadImage(filename.c_str(),0);
+      Mat m;
+      if(img!=NULL)
+      {
+        extractFeatures(img, m, fEx);
+        imageFeatureData.push_back(m);
+        categoryData.push_back(static_cast<float>(label));
+      }
+      else if(verbose)
+        cout << "\tFailed to open " << filename << endl;
+      if(label > numCategories)
+        numCategories = label;
+      cvReleaseImage(&img);
+    }
+    numCategories += 1;
+
+    shuffle(imageFeatureData,categoryData);
+
+    Mat trainData = imageFeatureData(Range(0,static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100),Range::all());
+    Mat categoryTrainData = categoryData(Range(0,static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100),Range::all());
+    Mat testData = imageFeatureData(Range(static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100,imageFeatureData.rows),Range::all());
+    Mat categoryTestData = categoryData(Range(static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100,imageFeatureData.rows),Range::all());
+
+  Mat responses;
+  CvStatModel* model = learningAlgorithmSetup(imageFeatureData.cols,
+      numCategories, lA);
+  float testErr;
+  learningAlgorithmTrain(model,trainData, categoryTrainData, numCategories,
+      lA);
+  learningAlgorithmPredict(model, testData, responses, numCategories, lA);
+  testErr = learningAlgorithmComputeErrorRate(responses,
+      categoryTestData);
+  cout << lAlgorithm << "validation error " << testErr*100 << "\%" 
+       << endl;
+  delete model;
+ 
+  return EXIT_SUCCESS;
+}
