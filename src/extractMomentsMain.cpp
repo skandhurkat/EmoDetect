@@ -176,8 +176,5 @@ int main(int argc, char** argv)
   cout << "ANN Test Error " << annTestErr << "\%" << endl;
   delete model;
   
-  file.close();
-  closedir(dir);
-
   return EXIT_SUCCESS;
 }
