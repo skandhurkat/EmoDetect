@@ -121,6 +121,7 @@ float learningAlgorithmComputeErrorRate(const Mat& predictedResponses,
 {
   assert(predictedResponses.rows == actualResponses.rows);
   assert(predictedResponses.cols == 1 && actualResponses.cols == 1);
+  assert(predictedResponses.rows != 0 && actualResponses.rows != 0);
   float error = 0;
   for(int i = 0; i < predictedResponses.rows; i++)
   {
@@ -129,4 +130,5 @@ float learningAlgorithmComputeErrorRate(const Mat& predictedResponses,
       error++;
   }
   error /= predictedResponses.rows;
+  return error;
 }
