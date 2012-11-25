@@ -1,5 +1,5 @@
 subdirs(FeatureExtractors)
-link_directories(FeatureExtractors)
+link_directories(${PROJECT_SOURCE_DIR}/src/FeatureExtractors)
 add_executable(readImage readImage.cpp)
 add_executable(extractMomentsMain
     LearningAlgorithms/learningAlgorithms.cpp
