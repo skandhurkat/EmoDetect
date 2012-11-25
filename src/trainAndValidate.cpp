@@ -25,6 +25,7 @@ void usage(const string programName, int exitCode)
          << "\t--saveClassifier=<file path>" << endl
          << "\t--percentageValidationData=<percentage of validation data>"
             << endl
+         << "\t--cascadeClassifier=<cascade path>" << endl
          << "\t--verbose" << endl
          << "\t--help" << endl;
     exit(exitCode);
@@ -61,7 +62,7 @@ int main(int argc, char** argv)
     const string programName = argv[0];
     int verbose = 0;
     float percentageTestData = 10;
-    const char* shortOptions = "i:f:l:s:p:h";
+    const char* shortOptions = "i:f:l:s:p:c:h";
     const option longOptions[] =
     {
         {"inputFile", required_argument, NULL, 'i'},
@@ -69,6 +70,7 @@ int main(int argc, char** argv)
         {"learningAlgorithm", required_argument, NULL, 'l'},
         {"saveClassifier", required_argument, NULL, 's'},
         {"percentageValidationData", required_argument, NULL, 'p'},
+        {"cascadeClassifier", required_argument, NULL, 'c'},
         {"verbose", no_argument, &verbose, 1},
         {"help", no_argument, NULL, 'h'},
         {NULL, 0, NULL, 0}
@@ -78,6 +80,7 @@ int main(int argc, char** argv)
     featureExtractor fEx;
     learningAlgorithm lA;
     string saveClassifierLocation; //TODO: Not implemented yet.
+    string cascadeClassifierName;
 
     int opt;
     while((opt=getopt_long(argc, argv, shortOptions, longOptions, NULL))
@@ -115,14 +118,20 @@ int main(int argc, char** argv)
         case 'p':
             percentageTestData = atof(optarg);
             break;
+        case 'c':
+            cascadeClassifierName = optarg;
+            break;
+        case 0: break;
         case '?':
         default :
+            cout << "Invalid arguments received!" << endl;
             usage(programName, EXIT_FAILURE);
             break;
         }
     }
     assert(!inputFilePath.empty());
     assert(percentageTestData > 0);
+    assert(!cascadeClassifierName.empty());
 
     string fExtractor = (fEx==GABOR)?"Gabor":
                         (fEx==HAAR)?"Haar":
@@ -138,11 +147,18 @@ int main(int argc, char** argv)
          << "\tFeature Extractor : " << fExtractor << endl
          << "\tLearning Algorithm: " << lAlgorithm << endl
          << "\tSave Classifier at: " << saveClassifierLocation << endl
-         << "\tPercentageTestData: " << percentageTestData << endl;
+         << "\tPercentageTestData: " << percentageTestData << endl
+         << "\tCascade Classifier: " << cascadeClassifierName << endl;
 
     string imagePath;
     Mat imageFeatureData;
     Mat categoryData;
+
+    CascadeClassifier haarCascade(cascadeClassifierName);
+    assert(!haarCascade.empty());
+    cout << "Classifier loaded from " << cascadeClassifierName << endl;
+
+    vector<Rect> detected;
 
     int numCategories = 0;
 
@@ -155,11 +171,21 @@ int main(int argc, char** argv)
       cin >> filename;
       if(verbose)
         cout << "Attempting to open " << filename << endl;
-      IplImage* img= cvLoadImage(filename.c_str(),0);
+      Mat img= imread(filename,CV_LOAD_IMAGE_GRAYSCALE);
       Mat m;
-      if(img!=NULL)
+      if(img.data)
       {
-        extractFeatures(img, m, fEx);
+        haarCascade.detectMultiScale(img, detected, 1.1, 3,
+            CV_HAAR_FIND_BIGGEST_OBJECT|CV_HAAR_DO_ROUGH_SEARCH);
+        if(detected.size() != 1)
+        {
+          cerr << "Error! Need exactly one face in " << filename << endl;
+          continue;
+        }
+        Mat cropped = img.rowRange(detected[0].y,
+            detected[0].y+detected[0].height).colRange(detected[0].x,
+            detected[0].x+detected[0].width);
+        extractFeatures(cropped, m, fEx);
         imageFeatureData.push_back(m);
         categoryData.push_back(static_cast<float>(label));
       }
@@ -167,7 +193,6 @@ int main(int argc, char** argv)
         cout << "\tFailed to open " << filename << endl;
       if(label > numCategories)
         numCategories = label;
-      cvReleaseImage(&img);
     }
     numCategories += 1;
 

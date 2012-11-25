@@ -10,7 +10,7 @@ using namespace std;
 
 enum featureExtractor {HAAR, GABOR, MOMENTS, PHOG};
 
-void extractFeatures(const IplImage* input, Mat& featureVector,
+void extractFeatures(const Mat& input, Mat& featureVector,
     featureExtractor fEx);
 
 #endif //__EXTRACT_FEATURES_H_INCLUDED

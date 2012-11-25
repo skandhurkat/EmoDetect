@@ -7,6 +7,6 @@ using namespace cv;
 #define NUM_MOMENTS 24
 #define MOMENTS_RESIZE 64
 
-void extractMoments(const IplImage* imgIpl, Mat& rVal);
+void extractMoments(const Mat& inputImage, Mat& rVal);
 
 #endif // __EXTRACT_MOMENTS_H

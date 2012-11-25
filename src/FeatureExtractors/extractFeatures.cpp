@@ -1,18 +1,28 @@
 #include <FeatureExtractors/extractFeatures.h>
 #include <Infrastructure/exceptions.h>
 
-void extractFeatures(const IplImage* inputImage, Mat& featureVector,
+void extractFeatures(const Mat& inputImage, Mat& featureVector,
     featureExtractor fEx)
 {
-  if(!inputImage) throw EMPTY_IMAGE_EXCEPTION;
+  if(inputImage.empty()) throw EMPTY_IMAGE_EXCEPTION;
   switch(fEx)
   {
   case HAAR:
-    extractHaarFeatures(inputImage, featureVector);
+    {
+    IplImage img = inputImage;
+    IplImage* Img = &img;
+    extractHaarFeatures(Img, featureVector);
+    cvReleaseImage(&Img);
     break;
+    }
   case GABOR:
-    extractGaborFeatures(inputImage, featureVector);
+    {
+    IplImage img = inputImage;
+    IplImage* Img = &img;
+    extractGaborFeatures(Img, featureVector);
+    cvReleaseImage(&Img);
     break;
+    }
   case MOMENTS:
     extractMoments(inputImage, featureVector);
     break;

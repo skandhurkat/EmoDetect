@@ -2,9 +2,9 @@
 #include <Infrastructure/exceptions.h>
 #include <iostream>
 using namespace std;
-void extractMoments(const IplImage* imgIpl, Mat& rVal)
+
+void extractMoments(const Mat& img, Mat& rVal)
 {
-  Mat img(imgIpl);
   if(!img.data)
     throw EMPTY_IMAGE_EXCEPTION;
   rVal.create(1, NUM_MOMENTS, CV_32F);  
