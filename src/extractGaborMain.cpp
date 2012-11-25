@@ -10,10 +10,8 @@ using namespace std;
 #include <getopt.h>
 #include <dirent.h>
 
-#include <FeatureExtractors/extractGabor.h>
-#include <LearningAlgorithms/svm.h>
-#include <LearningAlgorithms/rt.h>
-#include <LearningAlgorithms/ann.h>
+#include <FeatureExtractors/extractFeatures.h>
+#include <LearningAlgorithms/learningAlgorithms.h>
 #include <Infrastructure/exceptions.h>
 
 void usage(const string programName, int exitCode)
@@ -58,7 +56,7 @@ int main(int argc, char** argv)
     const char* shortOptions = "i:o:h";
     const option longOptions[] =
     {
-        {"inputFile", required_argument, NULL, 'd'},
+        {"inputFile", required_argument, NULL, 'i'},
         {"output", required_argument, NULL, 'o'},
         {"help", no_argument, NULL, 'h'},
         {NULL, 0, NULL, 0}
@@ -89,20 +87,10 @@ int main(int argc, char** argv)
     }
     assert(!inputFilePath.empty());
 
-    /*
-        assert(!outputPath.empty());
-    */
-
     cout << "Received arguments" << endl
          << "\tProgram Name  : " << programName << endl
          << "\tInput File Path: " << inputFilePath << endl
          << "\tOutput Path   : " << outputPath << endl;
-
-    /*
-        fstream file;
-        file.open(outputPath.c_str(), ios::out);
-        assert(file.is_open());
-    */
 
     string imagePath;
     Mat imageFeatureData;
@@ -116,55 +104,60 @@ int main(int argc, char** argv)
     int label;
     while(cin >> label)
     {
-        cin >> filename;
-        IplImage* img= cvLoadImage(filename.c_str(),0);
-        Mat m;
-        if(img!=NULL)
-        {
-            extractGaborFeatures(img, m);
-            imageFeatureData.push_back(m);
-            /*
-                for(int i = 0; i < NUM_GABOR_FEATURES; i++)
-                {
-                    file << '\t' << m.at<float>(0,i);
-                }
-                file << endl;
-            */
-            categoryData.push_back(static_cast<float>(label));
-        }
-        numCategories = label;
-        cvReleaseImage(&img);
+      cin >> filename;
+      IplImage* img= cvLoadImage(filename.c_str(),0);
+      Mat m;
+      if(img!=NULL)
+      {
+        extractFeatures(img, m, GABOR);
+        imageFeatureData.push_back(m);
+        categoryData.push_back(static_cast<float>(label));
+      }
+      numCategories = label;
+      cvReleaseImage(&img);
     }
     numCategories += 1;
 
     shuffle(imageFeatureData,categoryData);
 
-    float percentageTestData = 50;
+    float percentageTestData = 10;
 
     Mat trainData = imageFeatureData(Range(0,static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100),Range::all());
     Mat categoryTrainData = categoryData(Range(0,static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100),Range::all());
     Mat testData = imageFeatureData(Range(static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100,imageFeatureData.rows),Range::all());
     Mat categoryTestData = categoryData(Range(static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100,imageFeatureData.rows),Range::all());
 
-    float svmTestErr;
-    svmtrain(trainData,categoryTrainData);
-    svmTestErr = svmtest(testData,categoryTestData);
-    cout << "SVM Test Error " << svmTestErr << "\%" << endl;
-
-    float rtTestErr;
-    rttrain(trainData,categoryTrainData);
-    rtTestErr = rttest(testData,categoryTestData);
-    cout << "RT Test Error " << rtTestErr << "\%" << endl;
-
-    float annTestErr;
-    annSetup(trainData, categoryTrainData, numCategories);
-    anntrain(trainData,categoryTrainData);
-    annTestErr = anntest(testData, categoryData, numCategories);
-    cout << "ANN Test Error " << annTestErr << "\%" << endl;
-
-    /*
-        file.close();
-    */
-
-    return EXIT_SUCCESS;
+  Mat responses;
+  CvStatModel* model = learningAlgorithmSetup(imageFeatureData.cols,
+      numCategories, SVM_ML);
+  float svmTestErr;
+  learningAlgorithmTrain(model,trainData, categoryTrainData, numCategories,
+      SVM_ML);
+  learningAlgorithmPredict(model, testData, responses, numCategories, SVM_ML);
+  svmTestErr = learningAlgorithmComputeErrorRate(responses,
+      categoryTestData);
+  cout << "SVM Test Error " << svmTestErr*100 << "\%" << endl;
+  delete model;
+  
+  float rtTestErr;
+  model = learningAlgorithmSetup(imageFeatureData.cols, numCategories, RT);
+  learningAlgorithmTrain(model,trainData, categoryTrainData, numCategories,
+      RT);
+  learningAlgorithmPredict(model, testData, responses, numCategories, RT);
+  rtTestErr = learningAlgorithmComputeErrorRate(responses,
+      categoryTestData);
+  cout << "RT Test Error " << rtTestErr*100 << "\%" << endl;
+  delete model;
+  
+  float annTestErr;
+  model = learningAlgorithmSetup(imageFeatureData.cols, numCategories, ANN);
+  learningAlgorithmTrain(model,trainData, categoryTrainData, numCategories,
+      ANN);
+  learningAlgorithmPredict(model, testData, responses, numCategories, ANN);
+  annTestErr = learningAlgorithmComputeErrorRate(responses,
+      categoryTestData);
+  cout << "ANN Test Error " << annTestErr*100 << "\%" << endl;
+  delete model;
+  
+  return EXIT_SUCCESS;
 }

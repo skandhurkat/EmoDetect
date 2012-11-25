@@ -87,20 +87,10 @@ int main(int argc, char** argv)
     }
     assert(!inputFilePath.empty());
 
-    /*
-        assert(!outputPath.empty());
-    */
-
     cout << "Received arguments" << endl
          << "\tProgram Name  : " << programName << endl
          << "\tInput File Path: " << inputFilePath << endl
          << "\tOutput Path   : " << outputPath << endl;
-
-    /*
-        fstream file;
-        file.open(outputPath.c_str(), ios::out);
-        assert(file.is_open());
-    */
 
     string imagePath;
     Mat imageFeatureData;
@@ -114,17 +104,17 @@ int main(int argc, char** argv)
     int label;
     while(cin >> label)
     {
-        cin >> filename;
-        IplImage* img= cvLoadImage(filename.c_str(),0);
-        Mat m;
-        if(img!=NULL)
-        {
-          extractFeatures(img, m, MOMENTS);
-            imageFeatureData.push_back(m);
-            categoryData.push_back(static_cast<float>(label));
-        }
-        numCategories = label;
-        cvReleaseImage(&img);
+      cin >> filename;
+      IplImage* img= cvLoadImage(filename.c_str(),0);
+      Mat m;
+      if(img!=NULL)
+      {
+        extractFeatures(img, m, MOMENTS);
+        imageFeatureData.push_back(m);
+        categoryData.push_back(static_cast<float>(label));
+      }
+      numCategories = label;
+      cvReleaseImage(&img);
     }
     numCategories += 1;
 
@@ -146,9 +136,7 @@ int main(int argc, char** argv)
   learningAlgorithmPredict(model, testData, responses, numCategories, SVM_ML);
   svmTestErr = learningAlgorithmComputeErrorRate(responses,
       categoryTestData);
-  //svmtrain(trainData,categoryTrainData);
-  //svmTestErr = svmtest(testData,categoryTestData);
-  cout << "SVM Test Error " << svmTestErr << "\%" << endl;
+  cout << "SVM Test Error " << svmTestErr*100 << "\%" << endl;
   delete model;
   
   float rtTestErr;
@@ -158,9 +146,7 @@ int main(int argc, char** argv)
   learningAlgorithmPredict(model, testData, responses, numCategories, RT);
   rtTestErr = learningAlgorithmComputeErrorRate(responses,
       categoryTestData);
-  //rttrain(trainData,categoryTrainData);
-  //rtTestErr = svmtest(testData,categoryTestData);
-  cout << "RT Test Error " << rtTestErr << "\%" << endl;
+  cout << "RT Test Error " << rtTestErr*100 << "\%" << endl;
   delete model;
   
   float annTestErr;
@@ -170,10 +156,7 @@ int main(int argc, char** argv)
   learningAlgorithmPredict(model, testData, responses, numCategories, ANN);
   annTestErr = learningAlgorithmComputeErrorRate(responses,
       categoryTestData);
-  //annSetup(trainData, categoryTrainData, numCategories);
-  //anntrain(trainData,categoryTrainData);
-  //annTestErr = anntest(testData, categoryData, numCategories);
-  cout << "ANN Test Error " << annTestErr << "\%" << endl;
+  cout << "ANN Test Error " << annTestErr*100 << "\%" << endl;
   delete model;
   
   return EXIT_SUCCESS;
