@@ -7,5 +7,6 @@ using namespace cv;
 #define NUM_GABOR_FEATURES 10240
 
 void extractGaborFeatures(const IplImage* img, Mat& gb);
+void DisposeKernels();
 
 #endif // __EXTRACT_GABOR_H

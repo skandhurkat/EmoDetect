@@ -118,6 +118,8 @@ int main(int argc, char** argv)
     }
     numCategories += 1;
 
+    DisposeKernels();
+
     shuffle(imageFeatureData,categoryData);
 
     float percentageTestData = 10;
@@ -138,7 +140,7 @@ int main(int argc, char** argv)
       categoryTestData);
   cout << "SVM Test Error " << svmTestErr*100 << "\%" << endl;
   delete model;
-  
+
   float rtTestErr;
   model = learningAlgorithmSetup(imageFeatureData.cols, numCategories, RT);
   learningAlgorithmTrain(model,trainData, categoryTrainData, numCategories,
@@ -148,7 +150,7 @@ int main(int argc, char** argv)
       categoryTestData);
   cout << "RT Test Error " << rtTestErr*100 << "\%" << endl;
   delete model;
-  
+
   float annTestErr;
   model = learningAlgorithmSetup(imageFeatureData.cols, numCategories, ANN);
   learningAlgorithmTrain(model,trainData, categoryTrainData, numCategories,
@@ -158,6 +160,6 @@ int main(int argc, char** argv)
       categoryTestData);
   cout << "ANN Test Error " << annTestErr*100 << "\%" << endl;
   delete model;
-  
+
   return EXIT_SUCCESS;
 }

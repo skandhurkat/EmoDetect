@@ -23,6 +23,9 @@
 using namespace std;
 using namespace cv;
 
+CvMat** mGabor = NULL;
+bool kernelsDefined = false;
+
 int save_mat_image(CvMat* mat, char* name)
 {
   double maxVal,minVal;
@@ -312,6 +315,12 @@ void UnloadGaborFFT(CvMat** mGabor)
 
 }
 
+void DisposeKernels() {
+    if (kernelsDefined) {
+        UnloadGaborFFT(mGabor);
+    }
+}
+
 int Mulfft3( const CvArr* srcAarr, const CvArr* srcBarr, CvArr* dstarr )
 {
   CvMat *srcA = (CvMat*)srcAarr;
@@ -498,14 +507,17 @@ void extractGaborFeatures(const IplImage* img, Mat& gb)
   IplImage* tmp=cvCreateImage(size,IPL_DEPTH_64F,0);
 
   cvConvertScale(ipl,tmp,1.0,0);
-  CvMat** mGabor= LoadGaborFFT("gabor");
+  if (!kernelsDefined) {
+    mGabor= LoadGaborFFT("gabor");
+    kernelsDefined = true;
+  }
   /*Gabor wavelet*/
   gabor_extraction(tmp,object,mGabor);
   ZeroMeanUnitLength(object,nsize);
   cvReleaseImage( &tmp);
   cvReleaseImage( &ipl);
 
-  UnloadGaborFFT(mGabor);
+  //UnloadGaborFFT(mGabor);
   int actualSize = 0;
 
   for(int i=0;i<NUM_GABOR_FEATURES;i++) {
