@@ -59,28 +59,28 @@ void shuffle(Mat &data, Mat &catg)
 
 int main(int argc, char** argv)
 {
-    const string programName = argv[0];
-    int verbose = 0;
-    float percentageTestData = 10;
-    const char* shortOptions = "i:f:l:s:p:c:h";
-    const option longOptions[] =
-    {
-        {"inputFile", required_argument, NULL, 'i'},
-        {"featureExtractor", required_argument, NULL, 'f'},
-        {"learningAlgorithm", required_argument, NULL, 'l'},
-        {"saveClassifier", required_argument, NULL, 's'},
-        {"percentageValidationData", required_argument, NULL, 'p'},
-        {"cascadeClassifier", required_argument, NULL, 'c'},
-        {"verbose", no_argument, &verbose, 1},
-        {"help", no_argument, NULL, 'h'},
-        {NULL, 0, NULL, 0}
-    };
+  const string programName = argv[0];
+  int verbose = 0;
+  float percentageTestData = 10;
+  const char* shortOptions = "i:f:l:s:p:c:h";
+  const option longOptions[] =
+  {
+    {"inputFile", required_argument, NULL, 'i'},
+    {"featureExtractor", required_argument, NULL, 'f'},
+    {"learningAlgorithm", required_argument, NULL, 'l'},
+    {"saveClassifier", required_argument, NULL, 's'},
+    {"percentageValidationData", required_argument, NULL, 'p'},
+    {"cascadeClassifier", required_argument, NULL, 'c'},
+    {"verbose", no_argument, &verbose, 1},
+    {"help", no_argument, NULL, 'h'},
+    {NULL, 0, NULL, 0}
+  };
 
-    string inputFilePath;
-    featureExtractor fEx;
-    learningAlgorithm lA;
-    string saveClassifierLocation; //TODO: Not implemented yet.
-    string cascadeClassifierName;
+  string inputFilePath;
+  featureExtractor fEx;
+  learningAlgorithm lA;
+  string saveClassifierLocation; //TODO: Not implemented yet.
+  string cascadeClassifierName;
 
     int opt;
     while((opt=getopt_long(argc, argv, shortOptions, longOptions, NULL))
@@ -217,26 +217,42 @@ int main(int argc, char** argv)
       svm.save(saveClassifierLocation.c_str());
       cout << "Classifer saved" << endl;
     }
-    
-    /*
-    Mat trainData = imageFeatureData(Range(0,static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100),Range::all());
-    Mat categoryTrainData = categoryData(Range(0,static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100),Range::all());
-    Mat testData = imageFeatureData(Range(static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100,imageFeatureData.rows),Range::all());
-    Mat categoryTestData = categoryData(Range(static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100,imageFeatureData.rows),Range::all());
 
-  Mat responses;
-  CvStatModel* model = learningAlgorithmSetup(imageFeatureData.cols,
-      numCategories, lA);
-  float testErr;
-  learningAlgorithmTrain(model,trainData, categoryTrainData, numCategories,
-      lA);
-  learningAlgorithmPredict(model, testData, responses, numCategories, lA);
-  testErr = learningAlgorithmComputeErrorRate(responses,
-      categoryTestData);
-  cout << lAlgorithm << " validation error " << testErr*100 << "\%" 
+    Mat responses;
+    learningAlgorithmPredict(&svm, imageFeatureData, responses,
+        numCategories, SVM_ML);
+    float error= learningAlgorithmComputeErrorRate(responses, categoryData);
+    cout << "Error is " << error*100 << endl;
+
+    svm.clear();
+    svm.load(saveClassifierLocation.c_str());
+    cout << "Read classifier again from " << saveClassifierLocation << endl;
+
+    responses.release();
+    learningAlgorithmPredict(&svm, imageFeatureData, responses,
+        numCategories, SVM_ML);
+    error = learningAlgorithmComputeErrorRate(responses, categoryData);
+    cout << "Error is " << error*100 << endl;
+
+    /*
+       Mat trainData = imageFeatureData(Range(0,static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100),Range::all());
+       Mat categoryTrainData = categoryData(Range(0,static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100),Range::all());
+       Mat testData = imageFeatureData(Range(static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100,imageFeatureData.rows),Range::all());
+       Mat categoryTestData = categoryData(Range(static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100,imageFeatureData.rows),Range::all());
+
+       Mat responses;
+       CvStatModel* model = learningAlgorithmSetup(imageFeatureData.cols,
+       numCategories, lA);
+       float testErr;
+       learningAlgorithmTrain(model,trainData, categoryTrainData, numCategories,
+       lA);
+       learningAlgorithmPredict(model, testData, responses, numCategories, lA);
+       testErr = learningAlgorithmComputeErrorRate(responses,
+       categoryTestData);
+       cout << lAlgorithm << " validation error " << testErr*100 << "\%" 
        << endl;
-  delete model;
-  */
- 
-  return EXIT_SUCCESS;
+       delete model;
+     */
+
+    return EXIT_SUCCESS;
 }
