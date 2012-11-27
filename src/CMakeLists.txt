@@ -7,6 +7,9 @@ add_executable(trainAndValidate
 add_executable(trainAndValidateAllAlgos
     LearningAlgorithms/learningAlgorithms.cpp
     trainAndValidateAllAlgos.cpp)
+add_executable(trainAndCrossValidateSVM
+    LearningAlgorithms/learningAlgorithms.cpp
+    trainAndCrossValidateSVM.cpp)
 add_executable(extractMomentsMain
     LearningAlgorithms/learningAlgorithms.cpp
     extractMomentsMain.cpp)
@@ -23,6 +26,8 @@ target_link_libraries(readImage ${OpenCV_LIBS})
 target_link_libraries(trainAndValidate ${OpenCV_LIBS}
     featureExtractors)
 target_link_libraries(trainAndValidateAllAlgos ${OpenCV_LIBS}
+    featureExtractors)
+target_link_libraries(trainAndCrossValidateSVM ${OpenCV_LIBS}
     featureExtractors)
 target_link_libraries(extractMomentsMain ${OpenCV_LIBS}
     featureExtractors)
