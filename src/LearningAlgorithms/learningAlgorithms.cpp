@@ -32,6 +32,14 @@ CvStatModel* learningAlgorithmSetup(int featureVectorSize,
   return model;
 }
 
+CvStatModel* readModel(const string& inputFile)
+{
+  if(inputFile.empty()) throw EMPTY_FILE_EXCEPTION;
+  CvStatModel* model = new CvStatModel();
+  model->load(inputFile.c_str());
+  return model;
+}
+
 void learningAlgorithmTrain(CvStatModel* model,
     const Mat& trainData,
     const Mat& responses,
@@ -133,4 +141,10 @@ float learningAlgorithmComputeErrorRate(const Mat& predictedResponses,
   }
   error /= predictedResponses.rows;
   return error;
+}
+
+void writeModel(const CvStatModel* model, const string& outputFile)
+{
+  if(outputFile.empty()) throw EMPTY_FILE_EXCEPTION;
+  model->save(outputFile.c_str());
 }
