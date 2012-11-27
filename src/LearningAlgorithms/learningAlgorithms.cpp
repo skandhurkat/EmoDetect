@@ -32,11 +32,33 @@ CvStatModel* learningAlgorithmSetup(int featureVectorSize,
   return model;
 }
 
-CvStatModel* readModel(const string& inputFile)
+CvStatModel* readModel(const string& inputFile, learningAlgorithm lA)
 {
   if(inputFile.empty()) throw EMPTY_FILE_EXCEPTION;
-  CvStatModel* model = new CvStatModel();
-  model->load(inputFile.c_str());
+  CvStatModel* model = NULL;
+  switch(lA)
+  {
+  case ANN:
+    {
+        model = new CvANN_MLP();
+        (reinterpret_cast<CvANN_MLP *>(model))->load(inputFile.c_str());
+        break;
+    }
+  case SVM_ML:
+    {
+        model = new CvSVM();
+        (reinterpret_cast<CvSVM *>(model))->load(inputFile.c_str());
+        break;
+    }
+  case RT:
+    {
+        model = new CvRTrees();
+        (reinterpret_cast<CvRTrees *>(model))->load(inputFile.c_str());
+        break;
+    }
+  default:
+    throw INVALID_LEARNING_ALGORITHM;
+  }
   return model;
 }
 

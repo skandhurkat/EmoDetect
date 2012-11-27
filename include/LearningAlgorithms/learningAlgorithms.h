@@ -11,7 +11,7 @@ CvStatModel* learningAlgorithmSetup(int featureVectorSize,
     int numCategories,
     learningAlgorithm lA);
 
-CvStatModel* readModel(const string& inputFile);
+CvStatModel* readModel(const string& inputFile, learningAlgorithm lA);
 
 void learningAlgorithmTrain(CvStatModel* model,
     const Mat& trainData,
@@ -25,7 +25,7 @@ void learningAlgorithmPredict(CvStatModel* model,
     int numCategories,
     learningAlgorithm lA);
 
-float learningAlgorithmComputeErrorRate(const Mat& predictedResponses, 
+float learningAlgorithmComputeErrorRate(const Mat& predictedResponses,
     const Mat& actualResponses);
 
 void writeModel(const CvStatModel* model, const string& outputFile);
