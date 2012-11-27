@@ -4,6 +4,9 @@ add_executable(readImage readImage.cpp)
 add_executable(trainAndValidate
     LearningAlgorithms/learningAlgorithms.cpp
     trainAndValidate.cpp)
+add_executable(trainAndValidateAllAlgos
+    LearningAlgorithms/learningAlgorithms.cpp
+    trainAndValidateAllAlgos.cpp)
 add_executable(extractMomentsMain
     LearningAlgorithms/learningAlgorithms.cpp
     extractMomentsMain.cpp)
@@ -18,6 +21,8 @@ add_executable(extractGaborMain FeatureExtractors/extractGabor.cpp
     extractGaborMain.cpp)
 target_link_libraries(readImage ${OpenCV_LIBS})
 target_link_libraries(trainAndValidate ${OpenCV_LIBS}
+    featureExtractors)
+target_link_libraries(trainAndValidateAllAlgos ${OpenCV_LIBS}
     featureExtractors)
 target_link_libraries(extractMomentsMain ${OpenCV_LIBS}
     featureExtractors)
