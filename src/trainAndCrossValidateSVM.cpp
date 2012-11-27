@@ -144,7 +144,7 @@ int main(int argc, char** argv)
     cout << "Received arguments" << endl
          << "\tProgram Name      : " << programName << endl
          << "\tInput File Path   : " << inputFilePath << endl
-        train_auto << "\tFeature Extractor : " << fExtractor << endl
+         << "\tFeature Extractor : " << fExtractor << endl
          << "\tLearning Algorithm: " << lAlgorithm << endl
          << "\tSave Classifier at: " << saveClassifierLocation << endl
          << "\tPercentageTestData: " << percentageTestData << endl
@@ -205,7 +205,7 @@ int main(int argc, char** argv)
 
     CvSVM svm;
     SVMParams svmParams;
-    svmParams.kernelType = CvSVM::LINEAR;
+    svmParams.kernel_type = CvSVM::LINEAR;
     svm.train_auto(imageFeatureData, categoryData, Mat(), Mat(),
         svmParams);
 
