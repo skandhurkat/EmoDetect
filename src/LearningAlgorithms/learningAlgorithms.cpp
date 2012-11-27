@@ -99,7 +99,9 @@ void learningAlgorithmPredict(CvStatModel* model,
     }
   case SVM_ML:
     {
-    reinterpret_cast<CvSVM*>(model)->predict(featureData, responses);
+    CvMat fData = featureData;
+    CvMat resp = responses;
+    reinterpret_cast<CvSVM*>(model)->predict(&fData, &resp);
     break;
     }
   case RT:
