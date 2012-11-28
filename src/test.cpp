@@ -182,6 +182,7 @@ int main(int argc, char** argv)
       categoryData);
   cout << "Testing error is " << error*100 << "\%" << endl;
 
+  DisposeKernels();
   delete model;
 
   return EXIT_SUCCESS;

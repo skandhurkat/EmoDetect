@@ -206,7 +206,7 @@ int main(int argc, char** argv)
           (cvRound(result.at<float>(0,0))==SURPRISE)?"Surprise":
           "ERROR!";
         cout << "Detected emotion :" << emotion << endl;
-//        displayOverlay("Cropped Face", emotion, 0);
+        displayOverlay("Cropped Face", emotion, 0);
         waitKey(5000);
         destroyWindow("Cropped Face");
       }
@@ -265,6 +265,7 @@ int main(int argc, char** argv)
 //  cout << "SVM Classified as :: " << (cvRound(responsesTestData.at<float>(0,0))) << endl;
 //
   delete model;
+  DisposeKernels();
 
 //  if (captureCam) cvReleaseCapture(&captureCam);
 //  cvDestroyWindow("result");
