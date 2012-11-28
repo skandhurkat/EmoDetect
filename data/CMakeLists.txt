@@ -199,4 +199,16 @@ install( FILES
     gabor/Sgabor_4_6.data
     gabor/Sgabor_4_7.bmp
     gabor/Sgabor_4_7.data
- DESTINATION data/gabor)
+DESTINATION data/gabor)
+install( FILES
+    xml/ANN_moments.xml
+    xml/ANN_phog.xml
+    xml/RT_gabor.xml
+    xml/RT_haar_final.xml
+    xml/RT_moments_final.xml
+    xml/RT_PHoG_final.xml
+    xml/SVM_gabor.xml
+    xml/SVM_haar.xml
+    xml/SVM_moments.xml
+    xml/SVM_PHoG.xml
+  DESTINATION data/xml)
