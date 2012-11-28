@@ -62,4 +62,4 @@ target_link_libraries(extractGaborMain ${OpenCV_LIBS}
     featureExtractors)
 target_link_libraries(extractPHoGMain ${OpenCV_LIBS}
     featureExtractors)
-install(TARGETS trainAndValidate DESTINATION bin)
+install(TARGETS train test demo DESTINATION bin)

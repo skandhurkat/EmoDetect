@@ -174,6 +174,8 @@ int main(int argc, char** argv)
       if(c == KEY_ESCAPE)
       {
         destroyAllWindows();
+        delete model;
+        DisposeKernels();
         return EXIT_SUCCESS;
       }
       else if(c == KEY_SPACEBAR)
@@ -213,61 +215,72 @@ int main(int argc, char** argv)
     }
     destroyAllWindows();
   }
+  else
+  {
+    freopen (inputFilePath.c_str() ,"r", stdin);
 
-//  CvCapture* captureCam = NULL;
-//  captureCam = cvCaptureFromCAM(-1);
-//  IplImage* imageFromCam = NULL;
-//  cvNamedWindow("CamImage", 1);
-//  if (captureCam) {
-//    for(;;) {
-//      IplImage* iplImg = cvQueryFrame( captureCam );
-//      if( !iplImg ) {
-//        cout<<"Error: Cannot capture image from Cam!"<<endl;
-//        return 0;
-//      } else if( waitKey( 32 ) >= 0 ) {
-//        imageFromCam = iplImg;
-//        break;
-//      } else {
-//        imshow("CamImage", Mat(iplImg));
-//      }
-//    }
-//  } else {
-//    cout<<"Error: Reading opening the Cam"<<endl;
-//    return 0;
-//  }
-//  cout << " I am here\n ";
-//  Mat dynamicTest, dyTestColor(imageFromCam);
-//  cvtColor( dyTestColor, dynamicTest, CV_BGR2GRAY );
-//  //String filename = "E:/Fall2012/MachineLearning/Project/CS5780-Project/data/images/001/happiness/take003/img_0043.jpg";
-//  //Mat dynamicTest= imread(filename,CV_LOAD_IMAGE_GRAYSCALE);
-//  equalizeHist(dynamicTest, dynamicTest);
-//  if(dynamicTest.data)
-//  {
-//    haarCascade.detectMultiScale(dynamicTest, detected, 1.1, 3,
-//        CV_HAAR_FIND_BIGGEST_OBJECT|CV_HAAR_DO_ROUGH_SEARCH);
-//    if(detected.size() != 1)
-//    {
-//      cerr << "Error! Need exactly one face " << endl;
-//    }
-//    Mat m;
-//    Mat cropped = dynamicTest(detected[0]);
-//    imshow("Another", cropped);
-//    waitKey();
-//    extractFeatures(cropped, m, fEx);
-//    dynamicImageFeatureData.push_back(m);
-//  }
-//  int numCategories = 7;
-//  Mat responsesTestData;
-//  cout << "File :: " << inputFilePath << endl;
-//  CvStatModel *model = readModel(inputFilePath, lA[0]);
-//  learningAlgorithmPredict(model, dynamicImageFeatureData, responsesTestData, numCategories, lA[0]);
-//
-//  cout << "SVM Classified as :: " << (cvRound(responsesTestData.at<float>(0,0))) << endl;
-//
+    string filename;
+    int label;
+    while(cin >> label)
+    {
+      cin >> filename;
+      if(verbose)
+        cout << "Attempting to open " << filename << endl;
+      Mat gray= imread(filename,CV_LOAD_IMAGE_GRAYSCALE);
+      Mat m;
+      if(gray.data)
+      {
+        haarCascade.detectMultiScale(gray, detected, 1.1, 3,
+            CV_HAAR_FIND_BIGGEST_OBJECT|CV_HAAR_DO_ROUGH_SEARCH);
+        if(detected.size() != 1)
+        {
+          cerr << "Error! Need exactly one face in the picture" << endl;
+          continue;
+        }
+        Mat cropped = gray(detected[0]);
+        equalizeHist(cropped, cropped);
+        extractFeatures(cropped, features, fEx);
+        namedWindow(filename, CV_WINDOW_AUTOSIZE);
+        Mat resized;
+        resize(cropped, resized, Size(), 480.0/cropped.cols,
+            480.0/cropped.cols, INTER_LANCZOS4);
+        imshow(filename, resized);
+        Mat result;
+        learningAlgorithmPredict(model, features, result,
+            NUM_CATEGORIES, lA);
+        string emotion = 
+          (cvRound(result.at<float>(0,0))==ANGER)?"Anger":
+          (cvRound(result.at<float>(0,0))==DISGUST)?"Disgust":
+          (cvRound(result.at<float>(0,0))==FEAR)?"Fear":
+          (cvRound(result.at<float>(0,0))==HAPPINESS)?"Happiness":
+          (cvRound(result.at<float>(0,0))==NEUTRAL)?"Neutral":
+          (cvRound(result.at<float>(0,0))==SADNESS)?"Sadness":
+          (cvRound(result.at<float>(0,0))==SURPRISE)?"Surprise":
+          "ERROR!";
+        cout << "Detected emotion :" << emotion << endl;
+        displayOverlay(filename, emotion, 0);
+        int c;
+        while(c = waitKey())
+        {
+          if(c == KEY_ESCAPE)
+          {
+            destroyAllWindows();
+            delete model;
+            DisposeKernels();
+            return EXIT_SUCCESS;
+          }
+          else if(c == KEY_SPACEBAR)
+            break;
+        }
+        destroyWindow(filename);
+      }
+      else if(verbose)
+        cout << "\tFailed to open " << filename << endl;
+    }
+  }
+
   delete model;
   DisposeKernels();
 
-//  if (captureCam) cvReleaseCapture(&captureCam);
-//  cvDestroyWindow("result");
   return EXIT_SUCCESS;
 }
