@@ -170,6 +170,7 @@ int main(int argc, char** argv)
       cvtColor(img, gray, CV_BGR2GRAY);
       imshow("Video Input", img);
       int c = waitKey(30);
+      c &= 0xFF;
       if(c == KEY_ESCAPE)
       {
         destroyAllWindows();
@@ -185,6 +186,7 @@ int main(int argc, char** argv)
           continue;
         }
         Mat cropped = gray(detected[0]);
+        equalizeHist(cropped, cropped);
         extractFeatures(cropped, features, fEx);
         namedWindow("Cropped Face", CV_WINDOW_AUTOSIZE);
         Mat resized;
@@ -204,7 +206,7 @@ int main(int argc, char** argv)
           (cvRound(result.at<float>(0,0))==SURPRISE)?"Surprise":
           "ERROR!";
         cout << "Detected emotion :" << emotion << endl;
-        //displayOverlay("Cropped Face", emotion);
+//        displayOverlay("Cropped Face", emotion, 0);
         waitKey(5000);
         destroyWindow("Cropped Face");
       }
