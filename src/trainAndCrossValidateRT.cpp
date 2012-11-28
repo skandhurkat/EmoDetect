@@ -207,7 +207,7 @@ int main(int argc, char** argv)
     CvRTParams bestRTParams;
     float bestValidationError = HUGE_VAL;
     int bestDepth;
-    for(int depth = 3; depth < 15; depth += 2)
+    for(int depth = 3; depth < 25; depth += 4)
     {
       CvRTParams rtParams;
       float validationError = 0;
