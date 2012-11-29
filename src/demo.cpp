@@ -1,3 +1,17 @@
+//    This file is part of EmoDetect.
+//
+//    EmoDetect is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    EmoDetect is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with EmoDetect. If not, see <http://www.gnu.org/licenses/>.
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 using namespace cv;
@@ -190,11 +204,43 @@ int main(int argc, char** argv)
         Mat cropped = gray(detected[0]);
         equalizeHist(cropped, cropped);
         extractFeatures(cropped, features, fEx);
-        namedWindow("Cropped Face", CV_WINDOW_AUTOSIZE);
+        Mat m = features;
+		
+		namedWindow("Cropped Face", CV_WINDOW_AUTOSIZE);
         Mat resized;
         resize(cropped, resized, Size(), 480.0/cropped.cols,
             480.0/cropped.cols, INTER_LANCZOS4);
         imshow("Cropped Face", resized);
+        // For the demo only
+		if (fEx == GABOR) {
+			Mat featurekernel;
+            featurekernel = Mat::zeros(16*5, 16*8, CV_32FC1);
+            int n = 128*128/64;
+            float minVal = 0, maxVal = 0;
+            for(int loop1 =0; loop1 < 5; loop1++) {
+               for(int loop2 = 0; loop2 < 8; loop2++){
+			           for (int lx=4; lx<128; lx+=8)
+                           for (int ly=4; ly<128; ly+=8){
+								minVal = std::min(minVal, m.at<float>(0, ((loop1*8+loop2)*n+lx*2+ly/8)));
+				   }
+               }
+			}
+			if (minVal < 0) minVal *= -1.0;
+            for(int loop1 =0; loop1 < 5; loop1++) {
+               for(int loop2 = 0; loop2 < 8; loop2++){
+			           for (int lx=4; lx<128; lx+=8)
+                           for (int ly=4; ly<128; ly+=8){
+                           featurekernel.at<float>(loop1*8 + lx/8, loop2*8 + ly/8) = minVal + m.at<float>(0, ((loop1*8+loop2)*n+lx*2+ly/8));
+                    }
+                }
+            }
+           normalize(featurekernel, featurekernel, 0, 255, NORM_MINMAX, CV_32FC1);
+           //displayOverlay("AllKernels", "Feature Kernels");
+		   imshow("AllKernels", featurekernel);
+           imwrite("gaborImage.jpg", featurekernel);
+          // waitKey();
+		} 
+//    destroyWindow("AllKernels");
         Mat result;
         learningAlgorithmPredict(model, features, result,
             NUM_CATEGORIES, lA);

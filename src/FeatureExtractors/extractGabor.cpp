@@ -1,3 +1,17 @@
+//    This file is part of EmoDetect.
+//
+//    EmoDetect is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    EmoDetect is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with EmoDetect. If not, see <http://www.gnu.org/licenses/>.
 #include <FeatureExtractors/extractGabor.h>
 #include <Infrastructure/exceptions.h>
 #define  _CRT_SECURE_NO_DEPRECATE
@@ -19,6 +33,7 @@
 #define IMAGE_FILE_JPG "jpg"
 #define IMAGE_DIR "images"
 #define M_PI 3.14159265359
+#define WRITE_FEATURE_IMAGES true
 
 using namespace std;
 using namespace cv;
@@ -442,8 +457,7 @@ int gabor_extraction(IplImage* img,double* object,CvMat** mGabor)
 
   cvDFT( imdft, imdft, CV_DXT_FORWARD, w );
   n=w*h/64;
-
-
+  int displayCount = 0;
   for (i=0; i<5; i++)
     {
       for (j=0; j<8; j++)
@@ -454,6 +468,29 @@ int gabor_extraction(IplImage* img,double* object,CvMat** mGabor)
 	  cvMulSpectrums( imdft,mGabor[i*8+j], gout, 0);
 	  cvDFT( gout, gout, CV_DXT_INVERSE,w+h-1);
 
+	  if (WRITE_FEATURE_IMAGES) {
+		Mat featureImage;
+		featureImage = Mat::zeros(dft_M, dft_N, CV_64FC1);
+		for(int ii = 0; ii<dft_M; ii++) {
+            for(int jj =0; jj<dft_N; jj++) {
+                featureImage.at<double>(ii,jj) = ((double*)(gout->data.ptr + gout->step*(ii)))[jj];
+            }
+        }
+		if (i+1==j && displayCount < 2) {
+			char dftImage[20];
+			sprintf(dftImage,"DFTSpace_%d_%d.jpg", i, j);
+			imshow(dftImage, featureImage);
+			//waitKey();
+			char filename[20];
+			sprintf(filename, "kernel%d_%d.jpg", i, j);
+			imwrite(filename, featureImage);
+			Mat dispKernel(mGabor[i*8+j]);
+			imshow("Kernel", dispKernel);
+			//waitKey();
+			displayCount++;
+		}
+	  }
+	  
 	  /*downsample sacle factor 64*/
 	  for (x=4; x<w; x+=8)
 	    for (y=4; y<h; y+=8)
@@ -464,6 +501,8 @@ int gabor_extraction(IplImage* img,double* object,CvMat** mGabor)
 		  ((double*)(gout->data.ptr + gout->step*(x+h/2)))[(y+w/2)*2+1];
 
 		object[(i*8+j)*n+x/8*h/8+y/8]=sqrt(sum);
+		
+		
 	      }
 	  cvReleaseMat(&gout);
 	  ZeroMeanUnitLength(object,n);
