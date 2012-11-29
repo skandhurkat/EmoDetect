@@ -237,8 +237,8 @@ int main(int argc, char** argv)
            normalize(featurekernel, featurekernel, 0, 255, NORM_MINMAX, CV_32FC1);
            //displayOverlay("AllKernels", "Feature Kernels");
 		   imshow("AllKernels", featurekernel);
-       featurekernel.release();
            imwrite("gaborImage.jpg", featurekernel);
+       featurekernel.release();
           // waitKey();
 		} 
 //    destroyWindow("AllKernels");
