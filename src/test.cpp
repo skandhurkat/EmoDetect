@@ -4,6 +4,7 @@ using namespace cv;
 #include <cstdlib>
 #include <string>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <cstring>
 using namespace std;
@@ -13,6 +14,7 @@ using namespace std;
 #include <FeatureExtractors/extractFeatures.h>
 #include <LearningAlgorithms/learningAlgorithms.h>
 #include <Infrastructure/exceptions.h>
+#include <Infrastructure/defines.h>
 
 void usage(const string programName, int exitCode)
 {
@@ -178,9 +180,63 @@ int main(int argc, char** argv)
   Mat responses;
   learningAlgorithmPredict(model, imageFeatureData, responses,
       numCategories, lA);
-  float error = learningAlgorithmComputeErrorRate(responses,
-      categoryData);
+  Mat confusionMatrix(NUM_CATEGORIES, NUM_CATEGORIES, CV_32FC1,
+      Scalar(0.0));
+  float error = 0;
+  for(int i = 0; i < categoryData.rows; i++)
+  {
+    confusionMatrix.at<float>(cvRound(categoryData.at<float>(i,0)),
+        cvRound(responses.at<float>(i,0))) += 1.0;
+    if(cvRound(categoryData.at<float>(i,0)) !=
+        cvRound(responses.at<float>(i,0)))
+    {
+      error += 1.0;
+    }
+  }
+  error /= categoryData.rows;
   cout << "Testing error is " << error*100 << "\%" << endl;
+
+  cout << "Confusion matrix is" << endl;
+  for(int i = 0; i < NUM_CATEGORIES; i++)
+  {
+    if(i == ANGER)
+      cout << "& Anger ";
+    else if(i == DISGUST)
+      cout << "& Disgust ";
+    else if(i == FEAR)
+      cout << "& Fear "; 
+    else if(i == HAPPINESS)
+      cout << "& Happiness ";
+    else if(i == NEUTRAL)
+      cout << "& Neutral ";
+    else if(i == SADNESS)
+      cout << "& Sadness ";
+    else if(i == SURPRISE)
+      cout << "& Surprise ";
+  }
+  cout << "\\\\" << endl;
+  for(int i = 0; i < NUM_CATEGORIES; i++)
+  {
+    if(i == ANGER)
+      cout << "Anger ";
+    else if(i == DISGUST)
+      cout << "Disgust ";
+    else if(i == FEAR)
+      cout << "Fear "; 
+    else if(i == HAPPINESS)
+      cout << "Happiness ";
+    else if(i == NEUTRAL)
+      cout << "Neutral ";
+    else if(i == SADNESS)
+      cout << "Sadness ";
+    else if(i == SURPRISE)
+      cout << "Surprise ";
+    for(int j = 0; j < NUM_CATEGORIES; j++)
+    {
+        cout << "& "<< cvRound(confusionMatrix.at<float>(i,j)) << " ";
+    }
+    cout << "\\\\" << endl;
+  }
 
   DisposeKernels();
   delete model;
