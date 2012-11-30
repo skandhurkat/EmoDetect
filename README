@@ -1,1 +1,16 @@
-Code for CS5780, Fall 2012, Cornell University
+EmoDetect
+
+A project that enables computers to identify human emotion.
+
+The code is available under the terms of the GNU GPL v3, or, at your option,
+any higher version of the GNU GPL.
+
+The code is offered without any warranty, in the hope that it may help
+future efforts in the field of emotion detection.
+
+EmoDetect uses OpenCV (opencv.org) for most of the image processing and
+machine learning related tasks.
+
+We've trained classifiers on over 10,000 images from the MUG Facial
+Expression Database (http://mug.ee.auth.gr/fed); the trained classifiers
+are available in the data/xml folder.
