@@ -10,6 +10,8 @@ add_executable(test
 add_executable(demo
     LearningAlgorithms/learningAlgorithms.cpp
     demo.cpp)
+add_executable(validateHuman
+    validateHuman.cpp)
 add_executable(trainAndValidate
     LearningAlgorithms/learningAlgorithms.cpp
     trainAndValidate.cpp)
@@ -44,6 +46,7 @@ target_link_libraries(test ${OpenCV_LIBS}
     featureExtractors)
 target_link_libraries(demo ${OpenCV_LIBS}
     featureExtractors)
+target_link_libraries(validateHuman ${OpenCV_LIBS})
 target_link_libraries(trainAndValidate ${OpenCV_LIBS}
     featureExtractors)
 target_link_libraries(trainAndValidateAllAlgos ${OpenCV_LIBS}
