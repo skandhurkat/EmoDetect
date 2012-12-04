@@ -101,7 +101,8 @@ int main(int argc, char** argv)
 	cout << "Received arguments" << endl
 		<< "\tProgram Name      : " << programName << endl
 		<< "\tInput File Path   : " << inputFilePath << endl
-		<< "\tCascade Classifier: " << cascadeClassifierName << endl;
+		<< "\tCascade Classifier: " << cascadeClassifierName << endl
+		<< "\tOutput File Path  : " << outputFilePath << endl;
 
 	string imagePath;
 
@@ -254,8 +255,9 @@ int main(int argc, char** argv)
 
 	if(!outputFilePath.empty())
 	{
-		fstream file(outputFilePath.c_str());
-		if(!file)
+		cout << "Opening file " << outputFilePath << endl;
+		fstream file(outputFilePath.c_str(), ios::out);
+		if(file.fail())
 		{
 			cerr << "Error opening file " << outputFilePath << endl;
 			return EXIT_FAILURE;
@@ -301,6 +303,7 @@ int main(int argc, char** argv)
 			file << endl;
 		}
 		file.close();
+		cout << "Confusion matrix written to " << outputFilePath << endl;
 	}
   return EXIT_SUCCESS;
 }
