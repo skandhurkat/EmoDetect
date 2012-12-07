@@ -24,7 +24,9 @@ CvStatModel* learningAlgorithmSetup(int featureVectorSize,
   case ANN:
     {
     model = new CvANN_MLP();
-    int layerSizeArray[] = {featureVectorSize, 128, numCategories};
+    int layerSizeArray[] = {featureVectorSize,
+		                        featureVectorSize+numCategories,
+		                        numCategories};
     Mat layerSize = Mat(1, 3, CV_32S, layerSizeArray);
     reinterpret_cast<CvANN_MLP*>(model)
       ->create(layerSize, CvANN_MLP::SIGMOID_SYM, 1, 1);
