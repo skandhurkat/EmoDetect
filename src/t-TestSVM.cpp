@@ -28,6 +28,7 @@ using namespace std;
 #include <FeatureExtractors/extractFeatures.h>
 #include <LearningAlgorithms/learningAlgorithms.h>
 #include <Infrastructure/exceptions.h>
+#include <Infrastructure/defines.h>
 
 void usage(const string programName, int exitCode)
 {
@@ -217,18 +218,23 @@ int main(int argc, char** argv)
 
 	float bestValidationError = HUGE_VAL;
 
-	if(perSubject)
+		if(perSubject)
 	{
+		cout << "Now, cross validating across subjects" << endl;
+
 		SVMParams svmParams;
 		svmParams.kernel_type = CvSVM::LINEAR;
 		svmParams.C = CValue;
 		Mat validationError(numSubjects, 1, CV_32FC1);
+		Mat precision(numSubjects, NUM_CATEGORIES, CV_32FC1, 0.0);
+		Mat recall(numSubjects, NUM_CATEGORIES, CV_32FC1, 0.0);
 		for(int i = 0; i < numSubjects; i++)
 		{
 			Mat validationData = imageFeaturesBySubject[i];
 			Mat validationResponses = labelsBySubject[i];
 			Mat trainData;
 			Mat trainResponses;
+			Mat confusionMatrix(NUM_CATEGORIES, NUM_CATEGORIES, CV_32FC1, 0.0);
 			for(int j = 0; j < numSubjects; j++)
 			{
 				if(j == i)
@@ -242,8 +248,63 @@ int main(int argc, char** argv)
 					numCategories, SVM_ML);
 			validationError.at<float>(i,0) = 
 				learningAlgorithmComputeErrorRate(responses,validationResponses);
+			for(int j = 0; j < responses.rows; j++)
+			{
+				confusionMatrix.at<float>(
+						cvRound(validationResponses.at<float>(j,0)),
+						cvRound(responses.at<float>(j,0))) += 1;
+			}
+
+			for(int j = 0; j < NUM_CATEGORIES; j++)
+			{
+				float numerator = confusionMatrix.at<float>(j,j);
+				float denominator_p = 0;
+				float denominator_r = 0;
+				for(int k = 0; k < NUM_CATEGORIES; k++)
+				{
+					denominator_p += confusionMatrix.at<float>(k,j);
+					denominator_r += confusionMatrix.at<float>(j,k);
+				}
+				precision.at<float>(i,j) = numerator/denominator_p;
+				recall.at<float>(i,j) = numerator/denominator_r;
+				if(denominator_p == 0)
+					precision.at<float>(i,j) = 0;
+				if(denominator_r == 0)
+					recall.at<float>(i,j) = 0;
+			}
+
 			cout << "Validation error is " << validationError.at<float>(i,0)*100
-				<< "\% for subject " << i << endl;
+			     << "\% for subject " << i << endl;
+			cout << "Precision for" << endl
+				   << "\tAnger    : " << precision.at<float>(i,ANGER)*100 << "\%" 
+					 << endl
+				   << "\tDisgust  : " << precision.at<float>(i,DISGUST)*100 << "\%" 
+					 << endl
+				   << "\tFear     : " << precision.at<float>(i,FEAR)*100 << "\%" 
+					 << endl
+				   << "\tHappiness: " << precision.at<float>(i,HAPPINESS)*100 << "\%"
+					 << endl
+				   << "\tNeutral  : " << precision.at<float>(i,NEUTRAL)*100 << "\%" 
+					 << endl
+				   << "\tSadness  : " << precision.at<float>(i,SADNESS)*100 << "\%" 
+					 << endl
+				   << "\tSuprise  : " << precision.at<float>(i,SURPRISE)*100 << "\%"
+					 << endl;
+			cout << "Recall for" << endl
+				   << "\tAnger    : " << recall.at<float>(i,ANGER)*100 << "\%" 
+					 << endl
+				   << "\tDisgust  : " << recall.at<float>(i,DISGUST)*100 << "\%" 
+					 << endl
+				   << "\tFear     : " << recall.at<float>(i,FEAR)*100 << "\%" 
+					 << endl
+				   << "\tHappiness: " << recall.at<float>(i,HAPPINESS)*100 << "\%"
+					 << endl
+				   << "\tNeutral  : " << recall.at<float>(i,NEUTRAL)*100 << "\%" 
+					 << endl
+				   << "\tSadness  : " << recall.at<float>(i,SADNESS)*100 << "\%" 
+					 << endl
+				   << "\tSuprise  : " << recall.at<float>(i,SURPRISE)*100 << "\%"
+					 << endl;
 		}
 
 		cout << "Cross validation completed" << endl;
@@ -253,8 +314,68 @@ int main(int argc, char** argv)
 		m *= 100;
 		mu *= 100;
 
-		cout << "Mean   : " << m << endl
-			<< "StdDev : " << mu << endl;
+		cout << "Validation Error" << endl;
+		cout << "\tMean   : " << m.val[0] << endl
+			   << "\tStdDev : " << mu.val[0] << endl;
+		cout << "Precision" << endl;
+		cout << "\tAnger" << endl;
+		meanStdDev(precision.col(ANGER), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tDisgust" << endl;
+		meanStdDev(precision.col(DISGUST), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tFear" << endl;
+		meanStdDev(precision.col(FEAR), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tHappiness" << endl;
+		meanStdDev(precision.col(HAPPINESS), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tNeutral" << endl;
+		meanStdDev(precision.col(NEUTRAL), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tSadness" << endl;
+		meanStdDev(precision.col(SADNESS), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tSurprise" << endl;
+		meanStdDev(precision.col(SURPRISE), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+
+		cout << "Recall" << endl;
+		cout << "\tAnger" << endl;
+		meanStdDev(recall.col(ANGER), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tDisgust" << endl;
+		meanStdDev(recall.col(DISGUST), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tFear" << endl;
+		meanStdDev(recall.col(FEAR), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tHappiness" << endl;
+		meanStdDev(recall.col(HAPPINESS), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tNeutral" << endl;
+		meanStdDev(recall.col(NEUTRAL), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tSadness" << endl;
+		meanStdDev(recall.col(SADNESS), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tSurprise" << endl;
+		meanStdDev(recall.col(SURPRISE), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
 	}
 	else
 	{
@@ -268,11 +389,13 @@ int main(int argc, char** argv)
 
 #define NUM_SPLITS 20
 
+		int splitSize = imageFeatureData.rows/NUM_SPLITS;
 		SVMParams svmParams;
 		svmParams.kernel_type = CvSVM::LINEAR;
 		svmParams.C = CValue;
-		int splitSize = imageFeatureData.rows/NUM_SPLITS;
 		Mat validationError(NUM_SPLITS, 1, CV_32FC1);
+		Mat precision(NUM_SPLITS, NUM_CATEGORIES, CV_32FC1, 0.0);
+		Mat recall(NUM_SPLITS, NUM_CATEGORIES, CV_32FC1, 0.0);
 		for(int i = 0; i < NUM_SPLITS; i++)
 		{
 			Mat validationData = imageFeatureData.rowRange(i*splitSize,
@@ -281,6 +404,7 @@ int main(int argc, char** argv)
 					(i+1)*splitSize);
 			Mat trainData;
 			Mat trainResponses;
+			Mat confusionMatrix(NUM_CATEGORIES, NUM_CATEGORIES, CV_32FC1, 0.0);
 			if(i)
 			{
 				trainData = imageFeatureData.rowRange(0,i*splitSize);
@@ -303,8 +427,63 @@ int main(int argc, char** argv)
 					numCategories, SVM_ML);
 			validationError.at<float>(i,0) = 
 				learningAlgorithmComputeErrorRate(responses,validationResponses);
+			for(int j = 0; j < responses.rows; j++)
+			{
+				confusionMatrix.at<float>(
+						cvRound(validationResponses.at<float>(j,0)),
+						cvRound(responses.at<float>(j,0))) += 1;
+			}
+
+			for(int j = 0; j < NUM_CATEGORIES; j++)
+			{
+				float numerator = confusionMatrix.at<float>(j,j);
+				float denominator_p = 0;
+				float denominator_r = 0;
+				for(int k = 0; k < NUM_CATEGORIES; k++)
+				{
+					denominator_p += confusionMatrix.at<float>(k,j);
+					denominator_r += confusionMatrix.at<float>(j,k);
+				}
+				precision.at<float>(i,j) = numerator/denominator_p;
+				recall.at<float>(i,j) = numerator/denominator_r;
+				if(denominator_p == 0)
+					precision.at<float>(i,j) = 0;
+				if(denominator_r == 0)
+					recall.at<float>(i,j) = 0;
+			}
+
 			cout << "Validation error is " << validationError.at<float>(i,0)*100
-				<< "\% for subject " << i << endl;
+				<< "\% for split " << i << endl;
+			cout << "Precision for" << endl
+				   << "\tAnger    : " << precision.at<float>(i,ANGER)*100 << "\%" 
+					 << endl
+				   << "\tDisgust  : " << precision.at<float>(i,DISGUST)*100 << "\%" 
+					 << endl
+				   << "\tFear     : " << precision.at<float>(i,FEAR)*100 << "\%" 
+					 << endl
+				   << "\tHappiness: " << precision.at<float>(i,HAPPINESS)*100 << "\%"
+					 << endl
+				   << "\tNeutral  : " << precision.at<float>(i,NEUTRAL)*100 << "\%" 
+					 << endl
+				   << "\tSadness  : " << precision.at<float>(i,SADNESS)*100 << "\%" 
+					 << endl
+				   << "\tSuprise  : " << precision.at<float>(i,SURPRISE)*100 << "\%"
+					 << endl;
+			cout << "Recall for" << endl
+				   << "\tAnger    : " << recall.at<float>(i,ANGER)*100 << "\%" 
+					 << endl
+				   << "\tDisgust  : " << recall.at<float>(i,DISGUST)*100 << "\%" 
+					 << endl
+				   << "\tFear     : " << recall.at<float>(i,FEAR)*100 << "\%" 
+					 << endl
+				   << "\tHappiness: " << recall.at<float>(i,HAPPINESS)*100 << "\%"
+					 << endl
+				   << "\tNeutral  : " << recall.at<float>(i,NEUTRAL)*100 << "\%" 
+					 << endl
+				   << "\tSadness  : " << recall.at<float>(i,SADNESS)*100 << "\%" 
+					 << endl
+				   << "\tSuprise  : " << recall.at<float>(i,SURPRISE)*100 << "\%"
+					 << endl;
 		}
 
 		cout << "Cross validation completed" << endl;
@@ -314,8 +493,68 @@ int main(int argc, char** argv)
 		m *= 100;
 		mu *= 100;
 
-		cout << "Mean   : " << m << endl
-			<< "StdDev : " << mu << endl;
+		cout << "Validation Error" << endl;
+		cout << "\tMean   : " << m.val[0] << endl
+			   << "\tStdDev : " << mu.val[0] << endl;
+		cout << "Precision" << endl;
+		cout << "\tAnger" << endl;
+		meanStdDev(precision.col(ANGER), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tDisgust" << endl;
+		meanStdDev(precision.col(DISGUST), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tFear" << endl;
+		meanStdDev(precision.col(FEAR), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tHappiness" << endl;
+		meanStdDev(precision.col(HAPPINESS), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tNeutral" << endl;
+		meanStdDev(precision.col(NEUTRAL), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tSadness" << endl;
+		meanStdDev(precision.col(SADNESS), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tSurprise" << endl;
+		meanStdDev(precision.col(SURPRISE), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+
+		cout << "Recall" << endl;
+		cout << "\tAnger" << endl;
+		meanStdDev(recall.col(ANGER), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tDisgust" << endl;
+		meanStdDev(recall.col(DISGUST), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tFear" << endl;
+		meanStdDev(recall.col(FEAR), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tHappiness" << endl;
+		meanStdDev(recall.col(HAPPINESS), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tNeutral" << endl;
+		meanStdDev(recall.col(NEUTRAL), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tSadness" << endl;
+		meanStdDev(recall.col(SADNESS), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
+		cout << "\tSurprise" << endl;
+		meanStdDev(recall.col(SURPRISE), m, mu);
+		cout << "\t\tMean  : " << m.val[0] << endl
+		     << "\t\tStdDev: " << mu.val[0] << endl;
 	}
 
 	return EXIT_SUCCESS;
