@@ -27,6 +27,12 @@ add_executable(trainAndCrossValidateSVM
 add_executable(trainAndCrossValidateRT
     LearningAlgorithms/learningAlgorithms.cpp
     trainAndCrossValidateRT.cpp)
+add_executable(t-TestRT
+		LearningAlgorithms/learningAlgorithms.cpp
+		t-TestRT.cpp)
+add_executable(t-TestSVM
+		LearningAlgorithms/learningAlgorithms.cpp
+		t-TestSVM.cpp)
 add_executable(extractMomentsMain
     LearningAlgorithms/learningAlgorithms.cpp
     extractMomentsMain.cpp)
@@ -57,6 +63,8 @@ target_link_libraries(trainAndCrossValidateSVM ${OpenCV_LIBS}
     featureExtractors)
 target_link_libraries(trainAndCrossValidateRT ${OpenCV_LIBS}
     featureExtractors)
+target_link_libraries(t-TestRT ${OpenCV_LIBS} featureExtractors)
+target_link_libraries(t-TestSVM ${OpenCV_LIBS} featureExtractors)
 target_link_libraries(extractMomentsMain ${OpenCV_LIBS}
     featureExtractors)
 target_link_libraries(extractHaarMain ${OpenCV_LIBS}
