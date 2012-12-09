@@ -21,7 +21,6 @@ using namespace cv;
 #include <iostream>
 #include <fstream>
 #include <cstring>
-#include <ctime>
 using namespace std;
 #include <getopt.h>
 #include <dirent.h>
