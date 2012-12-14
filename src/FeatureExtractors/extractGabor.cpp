@@ -355,7 +355,6 @@ int Mulfft3( const CvArr* srcAarr, const CvArr* srcBarr, CvArr* dstarr )
     {
       for( j = 0; j < cols; j ++ )
         {
-//  cout<<(i*2)<< " " <<(j*2)<<endl;
 	  c_re = ((double*)(srcA->data.ptr + srcA->step*i))[j*2]*((double*)(srcB->data.ptr + srcB->step*i))[j*2] -
 	    ((double*)(srcA->data.ptr + srcA->step*i))[j*2+1]*((double*)(srcB->data.ptr + srcB->step*i))[j*2+1];
 	  c_im = ((double*)(srcA->data.ptr + srcA->step*i))[j*2]*((double*)(srcB->data.ptr + srcB->step*i))[j*2+1] +
@@ -392,7 +391,6 @@ int writeData(double* v, int length, FILE* fh)
   for(i=0; i<length ; i++)
     {
       Elem[i+2]=v[i];
-      //cout << v[i] << endl;
     }
 
 

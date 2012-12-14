@@ -14,6 +14,7 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with EmoDetect. If not, see <http://www.gnu.org/licenses/>.
+
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 using namespace cv;

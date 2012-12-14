@@ -215,7 +215,7 @@ int main(int argc, char** argv)
         numCategories = label;
     }
     numCategories += 1;
-    DisposeKernels(); //TODO: Repair this cheap hack
+    DisposeKernels();
 
     CvStatModel* model = learningAlgorithmSetup(imageFeatureData.cols,
         numCategories, lA);
@@ -234,24 +234,6 @@ int main(int argc, char** argv)
       writeModel(model, saveClassifierLocation);
     }
 
-    /*shuffle(imageFeatureData,categoryData);
-
-    Mat trainData = imageFeatureData(Range(0,static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100),Range::all());
-    Mat categoryTrainData = categoryData(Range(0,static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100),Range::all());
-    Mat testData = imageFeatureData(Range(static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100,imageFeatureData.rows),Range::all());
-    Mat categoryTestData = categoryData(Range(static_cast<int>((100-percentageTestData)*imageFeatureData.rows)/100,imageFeatureData.rows),Range::all());
-
-  Mat responses;
-  CvStatModel* model = learningAlgorithmSetup(imageFeatureData.cols,
-      numCategories, lA);
-  float testErr;
-  learningAlgorithmTrain(model,trainData, categoryTrainData, numCategories,
-      lA);
-  learningAlgorithmPredict(model, testData, responses, numCategories, lA);
-  testErr = learningAlgorithmComputeErrorRate(responses,
-      categoryTestData);
-  cout << lAlgorithm << " validation error " << testErr*100 << "\%" 
-       << endl;*/
   delete model;
  
   return EXIT_SUCCESS;

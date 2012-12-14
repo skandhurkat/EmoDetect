@@ -97,7 +97,7 @@ int main(int argc, char** argv)
     string inputFilePath;
     featureExtractor fEx;
     learningAlgorithm lA;
-    string saveClassifierLocation; //TODO: Not implemented yet.
+    string saveClassifierLocation; 
     string cascadeClassifierName;
 
     int opt;
@@ -215,7 +215,7 @@ int main(int argc, char** argv)
         numCategories = label;
     }
     numCategories += 1;
-    DisposeKernels(); //TODO: Repair this cheap hack
+    DisposeKernels(); 
 
     shuffle(imageFeatureData,categoryData);
 

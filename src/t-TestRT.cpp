@@ -201,9 +201,7 @@ int main(int argc, char** argv)
 			Mat cropped = img(detected[0]);
 			equalizeHist(cropped, cropped);
 			extractFeatures(cropped, m, fEx);
-			//        imageFeatureData.push_back(m);
 			imageFeaturesBySubject[cSubject].push_back(m);
-			//        categoryData.push_back(static_cast<float>(label));
 			labelsBySubject[cSubject].push_back(static_cast<float>(label));
 			numImages++;
 			if(!(numImages%100) && !verbose)
@@ -216,7 +214,7 @@ int main(int argc, char** argv)
 	}
 	numCategories += 1;
 	int numSubjects = cSubject+1;
-	DisposeKernels(); //TODO: Repair this cheap hack
+	DisposeKernels(); 
 	cout << "Finished reading images and extracting features" << endl;
 
 	CvRTParams bestRTParams;

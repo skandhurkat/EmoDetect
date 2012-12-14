@@ -98,7 +98,7 @@ int main(int argc, char** argv)
     string inputFilePath;
     featureExtractor fEx;
     vector<learningAlgorithm> lA;
-    string saveClassifierLocation; //TODO: Not implemented yet.
+    string saveClassifierLocation; 
     string cascadeClassifierName;
 
     int opt;
@@ -213,8 +213,6 @@ int main(int argc, char** argv)
     cout << " I am here\n ";
     Mat dynamicTest, dyTestColor(imageFromCam);
     cvtColor( dyTestColor, dynamicTest, CV_BGR2GRAY );
-    //String filename = "E:/Fall2012/MachineLearning/Project/CS5780-Project/data/images/001/happiness/take003/img_0043.jpg";
-    //Mat dynamicTest= imread(filename,CV_LOAD_IMAGE_GRAYSCALE);
     equalizeHist(dynamicTest, dynamicTest);
     if(dynamicTest.data)
     {
