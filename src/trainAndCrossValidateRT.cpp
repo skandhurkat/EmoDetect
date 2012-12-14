@@ -1,3 +1,6 @@
+//    File name: trainAndCrossValidateRT.cpp
+//    (c) Rishabh Animesh, Skand Hurkat, Abhinandan Majumdar, Aayush Saxena, 2012
+
 //    This file is part of EmoDetect.
 //
 //    EmoDetect is free software: you can redistribute it and/or modify
