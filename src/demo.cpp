@@ -1,3 +1,5 @@
+//    File name: demo.cpp
+//    (c) Rishabh Animesh, Skand Hurkat, Abhinandan Majumdar, Aayush Saxena
 //    This file is part of EmoDetect.
 //
 //    EmoDetect is free software: you can redistribute it and/or modify
@@ -12,6 +14,7 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with EmoDetect. If not, see <http://www.gnu.org/licenses/>.
+
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 using namespace cv;

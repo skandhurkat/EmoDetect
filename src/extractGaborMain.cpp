@@ -1,3 +1,5 @@
+//    File name: extractGaborMain.cpp
+//    (c) Rishabh Animesh, Skand Hurkat, Abhinandan Majumdar, Aayush Saxena
 //    This file is part of EmoDetect.
 //
 //    EmoDetect is free software: you can redistribute it and/or modify

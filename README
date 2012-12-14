@@ -14,3 +14,29 @@ machine learning related tasks.
 We've trained classifiers on over 10,000 images from the MUG Facial
 Expression Database (http://mug.ee.auth.gr/fed); the trained classifiers
 are available in the data/xml folder.
+
+File Usage:
+	demo				:	Binary for Project Demonstration
+	extractGaborMain		:	Extracts Gabor features and dumps it to a file
+	extractPHoGMain			:	Extracts HoG features and dumps it to a file
+	extractHaarMain			:	Extracts Haar features and dumps it to a file
+	extractMomentsMain		:	Extracts Mom features and dumps it to a file
+	readImage			:	Read image from a file and display it
+	test				:	Test a specific extractor-learner combination on a set of test images
+	train				:	Train from a database of images using a specific extractor-learner combination and save the classifier to a file
+	trainAndCrossValidateRT		:	Train and Cross Validate for Random Trees (RT) and produce the optimum max_depth
+	trainAndCrossValidateSVM	:	Train and Cross Validate for Support Vector Machines (SVM) and produce the optimum max_depth
+	trainAndTestAllAlgos		:	Train and Test without cross validation using the trained classifer (default)
+	trainAndValidate		:	Train using a saved classifier and measure the test error on a test set
+	validateHuman			:	Executable that shows 50 random images and asks the user to guess their right emotion
+
+Usage:
+	Run any binary with -h option to see the usage of the command-line arguments
+Compilation
+	Package depends on OpenCV version 2.4 or higher installed with the WITH_QT flag and uses CMAKE for compilation
+	
+	
+	
+
+
+	

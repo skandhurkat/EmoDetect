@@ -1,3 +1,6 @@
+//    File name: extractPHoG.cpp
+//    (c) Rishabh Animesh, Skand Hurkat, Abhinandan Majumdar, Aayush Saxena, 2012
+
 //    This file is part of EmoDetect.
 //
 //    EmoDetect is free software: you can redistribute it and/or modify
@@ -12,6 +15,7 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with EmoDetect. If not, see <http://www.gnu.org/licenses/>.
+
 #include <FeatureExtractors/extractPHoG.h>
 #include <Infrastructure/exceptions.h>
 
@@ -50,7 +54,6 @@ void extractPHoG(const Mat& img, Mat& PHOG)
           _dy = static_cast<float>(dy.at<int16_t>(m*l_x+i, n*l_y+j));
           grad_value = static_cast<float>(std::sqrt(1.0*_dx*_dx + _dy*_dy)
                                           /area_img);
-          //*grad_value_it = sqrt(_dy*_dy + _dx*_dx)/area_img;
 
           angle = std::atan2(_dy, _dx);
           if(angle < 0)
