@@ -1,5 +1,6 @@
 //    File name: extractGabor.cpp
-//    (c) Rishabh Animesh, Skand Hurkat, Abhinandan Majumdar, Aayush Saxena, 2012
+//    The code is borrowed from "Gabor Wavelets Transform for Face Recognition"
+//    which is available at http://code.google.com/p/gaborextract/
 
 //    This file is part of EmoDetect.
 //
