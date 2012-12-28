@@ -8,9 +8,42 @@ any higher version of the GNU GPL.
 The code is offered without any warranty, in the hope that it may help
 future efforts in the field of emotion detection.
 
-EmoDetect uses OpenCV (opencv.org) for most of the image processing and
+EmoDetect uses OpenCV (http://opencv.org) for most of the image processing and
 machine learning related tasks.
 
 We've trained classifiers on over 10,000 images from the MUG Facial
 Expression Database (http://mug.ee.auth.gr/fed); the trained classifiers
 are available in the data/xml folder.
+
+File Usage:
+    demo                    : Binary for Project Demonstration
+    extractGaborMain        : Extracts Gabor features and dumps them to a file
+    extractPHoGMain         : Extracts HoG features and dumps them to a file
+    extractHaarMain         : Extracts Haar features and dumps them to a file
+    extractMomentsMain      : Extracts Mom features and dumps them to a file
+    readImage               : Read image from a file and display it
+                              (Hello World equivalent for OpenCV)
+    test                    : Test a specific extractor-learner combination on 
+                              a set of test images
+    train                   : Train from a database of images using a specific 
+                              extractor-learner combination and save the 
+                              classifier to a file
+    trainAndCrossValidateRT : Train and Cross Validate for Random Trees 
+                              (RT) and produce the optimum max_depth
+    trainAndCrossValidateSVM: Train and Cross Validate for Support 
+                              Vector Machines (SVM) and produce the optimum 
+                              max_depth
+    trainAndTestAllAlgos    : Train and Test without cross validation 
+                              using the trained classifer (default)
+    trainAndValidate        : Train using a saved classifier and measure 
+                              the test error on a test set
+    validateHuman           : Executable shows 50 random images and 
+                              asks the user to guess their right emotion
+
+Usage:
+    Run any binary with --help option to see the command line interface for the
+    binary
+    
+Compilation
+    Package OpenCV (>2.4) installed with the WITH_QT flag set
+    CMAKE (>2.6) is required for compilation

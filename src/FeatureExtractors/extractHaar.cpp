@@ -1,3 +1,6 @@
+//    File name: extractHaar.cpp
+//    (c) Rishabh Animesh, Skand Hurkat, Abhinandan Majumdar, Aayush Saxena, 2012
+
 //    This file is part of EmoDetect.
 //
 //    EmoDetect is free software: you can redistribute it and/or modify
@@ -12,6 +15,7 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with EmoDetect. If not, see <http://www.gnu.org/licenses/>.
+
 #include <FeatureExtractors/extractHaar.h>
 #include <Infrastructure/exceptions.h>
 
@@ -59,10 +63,6 @@ void extractHaarFeatures(const IplImage* img, Mat& haar)
   CvMat * sqSum = cvCreateMat(temp->height + 1, temp->width + 1, CV_64FC1);
   cvIntegral(temp, integral, sqSum);
   cvReleaseMat(&sqSum);
-
-//  IplImage* tem = cvCreateImage(size2, IPL_DEPTH_64F, 0);
-//  cvCvtScale(integral,tem);
-//  cvNormalize(tem, tem, 0, 255, CV_MINMAX);
 
   int actualSize = 0;
   // top left

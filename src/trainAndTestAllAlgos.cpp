@@ -1,3 +1,6 @@
+//    File name: trainAndTestAllAlgos.cpp
+//    (c) Rishabh Animesh, Skand Hurkat, Abhinandan Majumdar, Aayush Saxena, 2012
+
 //    This file is part of EmoDetect.
 //
 //    EmoDetect is free software: you can redistribute it and/or modify
@@ -12,6 +15,7 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with EmoDetect. If not, see <http://www.gnu.org/licenses/>.
+
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 using namespace cv;
@@ -94,7 +98,7 @@ int main(int argc, char** argv)
     string inputFilePath;
     featureExtractor fEx;
     vector<learningAlgorithm> lA;
-    string saveClassifierLocation; //TODO: Not implemented yet.
+    string saveClassifierLocation; 
     string cascadeClassifierName;
 
     int opt;
@@ -209,8 +213,6 @@ int main(int argc, char** argv)
     cout << " I am here\n ";
     Mat dynamicTest, dyTestColor(imageFromCam);
     cvtColor( dyTestColor, dynamicTest, CV_BGR2GRAY );
-    //String filename = "E:/Fall2012/MachineLearning/Project/CS5780-Project/data/images/001/happiness/take003/img_0043.jpg";
-    //Mat dynamicTest= imread(filename,CV_LOAD_IMAGE_GRAYSCALE);
     equalizeHist(dynamicTest, dynamicTest);
     if(dynamicTest.data)
     {

@@ -1,3 +1,7 @@
+//    File name: extractGabor.cpp
+//    The code is borrowed from "Gabor Wavelets Transform for Face Recognition"
+//    which is available at http://code.google.com/p/gaborextract/
+
 //    This file is part of EmoDetect.
 //
 //    EmoDetect is free software: you can redistribute it and/or modify
@@ -12,6 +16,7 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with EmoDetect. If not, see <http://www.gnu.org/licenses/>.
+
 #include <FeatureExtractors/extractGabor.h>
 #include <Infrastructure/exceptions.h>
 #define  _CRT_SECURE_NO_DEPRECATE
@@ -309,7 +314,6 @@ CvMat** LoadGaborFFT(char* fldname)
     for(j=0; j<8; j++)
       {
 	sprintf(filename,"%s/FFT%s_%d_%d.data",fldname,"gabor",i,j);
-	//cout << filename << endl;
 	FILE *ifp = fopen(filename, "rb");
 	mGabor[i*8+j]	= GetMat(ifp,false);
 	fclose(ifp);
@@ -350,7 +354,6 @@ int Mulfft3( const CvArr* srcAarr, const CvArr* srcBarr, CvArr* dstarr )
     {
       for( j = 0; j < cols; j ++ )
         {
-//  cout<<(i*2)<< " " <<(j*2)<<endl;
 	  c_re = ((double*)(srcA->data.ptr + srcA->step*i))[j*2]*((double*)(srcB->data.ptr + srcB->step*i))[j*2] -
 	    ((double*)(srcA->data.ptr + srcA->step*i))[j*2+1]*((double*)(srcB->data.ptr + srcB->step*i))[j*2+1];
 	  c_im = ((double*)(srcA->data.ptr + srcA->step*i))[j*2]*((double*)(srcB->data.ptr + srcB->step*i))[j*2+1] +
@@ -387,7 +390,6 @@ int writeData(double* v, int length, FILE* fh)
   for(i=0; i<length ; i++)
     {
       Elem[i+2]=v[i];
-      //cout << v[i] << endl;
     }
 
 

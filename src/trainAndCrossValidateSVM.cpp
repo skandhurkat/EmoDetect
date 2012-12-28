@@ -1,3 +1,6 @@
+//    File name: trainAndCrossValidateSVM.cpp
+//    (c) Rishabh Animesh, Skand Hurkat, Abhinandan Majumdar, Aayush Saxena, 2012
+
 //    This file is part of EmoDetect.
 //
 //    EmoDetect is free software: you can redistribute it and/or modify
@@ -197,9 +200,7 @@ int main(int argc, char** argv)
 			Mat cropped = img(detected[0]);
 			equalizeHist(cropped, cropped);
 			extractFeatures(cropped, m, fEx);
-			//        imageFeatureData.push_back(m);
 			imageFeaturesBySubject[cSubject].push_back(m);
-			//        categoryData.push_back(static_cast<float>(label));
 			labelsBySubject[cSubject].push_back(static_cast<float>(label));
 			numImages++;
 			if(!(numImages%100) && !verbose)
@@ -212,7 +213,7 @@ int main(int argc, char** argv)
 	}
 	numCategories += 1;
 	int numSubjects = cSubject+1;
-	DisposeKernels(); //TODO: Repair this cheap hack
+	DisposeKernels(); 
 	cout << "Finished reading images and extracting features" << endl;
 
 	SVMParams bestSVMParams;
@@ -221,13 +222,6 @@ int main(int argc, char** argv)
 	if(perSubject)
 	{
 		cout << "Now, cross validating across subjects" << endl;
-
-		//    CvSVM svm;
-		//    SVMParams svmParams;
-		//    svmParams.kernel_type = CvSVM::LINEAR;
-		//    svm.train_auto(imageFeatureData, categoryData, Mat(), Mat(),
-		//        svmParams);
-
 		CvParamGrid params = CvSVM::get_default_grid(CvSVM::C);
 		while(params.min_val <= params.max_val)
 		{
@@ -239,7 +233,6 @@ int main(int argc, char** argv)
 			{
 				Mat validationData = imageFeaturesBySubject[i];
 				Mat validationResponses = labelsBySubject[i];
-				//			cout << validationData.rows << " " << validationResponses.rows;
 				Mat trainData;
 				Mat trainResponses;
 				for(int j = 0; j < numSubjects; j++)
