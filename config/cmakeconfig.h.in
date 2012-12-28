@@ -1,0 +1,4 @@
+//cmakeconfig.h
+//holds some random defines for install invariance
+
+#define GABOR_DATA_DIR_PATH "@Gabor_Data_Files@"

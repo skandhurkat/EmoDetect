@@ -12,7 +12,9 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with EmoDetect. If not, see <http://www.gnu.org/licenses/>.
+
 #include <opencv2/opencv.hpp>
+#include <cmakeconfig.h>
 using namespace cv;
 
 #ifndef __EXTRACT_GABOR_H
