@@ -313,7 +313,7 @@ CvMat** LoadGaborFFT(char* fldname)
   for(i=0; i<5; i++)
     for(j=0; j<8; j++)
       {
-	sprintf(filename,"../data/%s/FFT%s_%d_%d.data",fldname,"gabor",i,j);
+	sprintf(filename,"%s/FFT%s_%d_%d.data",fldname,"gabor",i,j);
 	//cout << filename << endl;
 	FILE *ifp = fopen(filename, "rb");
 	mGabor[i*8+j]	= GetMat(ifp,false);
@@ -525,7 +525,7 @@ void extractGaborFeatures(const IplImage* img, Mat& gb)
 
   cvConvertScale(ipl,tmp,1.0,0);
   if (!kernelsDefined) {
-    mGabor= LoadGaborFFT("gabor");
+    mGabor= LoadGaborFFT(GABOR_DATA_DIR_PATH);
     kernelsDefined = true;
   }
   /*Gabor wavelet*/
